@@ -24,12 +24,56 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->applyVercelServerlessDefaults();
+
         // Only force HTTPS in production. In local/dev, use whatever scheme the server uses
         // so assets load correctly (php artisan serve is HTTP-only; forcing https causes ERR_CONNECTION_CLOSED).
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
         $this->configureDefaults();
+    }
+
+    /**
+     * Vercel PHP is serverless: database session/cache/queue force a DB round-trip every request.
+     * If MySQL is slow or misconfigured, the whole site returns 500. Force safe drivers unless opted in.
+     * Set ALLOW_VERCEL_DATABASE_DRIVERS=true in Vercel when DB + tables are proven and you need them.
+     */
+    protected function applyVercelServerlessDefaults(): void
+    {
+        if (! $this->runningOnVercel()) {
+            return;
+        }
+
+        if (filter_var(env('ALLOW_VERCEL_DATABASE_DRIVERS'), FILTER_VALIDATE_BOOLEAN)) {
+            return;
+        }
+
+        if (config('session.driver') === 'database') {
+            config(['session.driver' => 'cookie']);
+        }
+
+        $cache = config('cache.default');
+        if (in_array($cache, ['database', 'redis', 'memcached', 'dynamodb'], true)) {
+            config(['cache.default' => 'array']);
+        }
+
+        if (config('queue.default') === 'database') {
+            config(['queue.default' => 'sync']);
+        }
+    }
+
+    protected function runningOnVercel(): bool
+    {
+        $vercel = env('VERCEL', getenv('VERCEL') ?: '');
+
+        if (filter_var($vercel, FILTER_VALIDATE_BOOLEAN)) {
+            return true;
+        }
+
+        $vercelUrl = env('VERCEL_URL', getenv('VERCEL_URL') ?: '');
+
+        return is_string($vercelUrl) && $vercelUrl !== '';
     }
 
     protected function configureDefaults(): void

@@ -39,7 +39,7 @@ export default defineConfig({
             ? [
                   VitePWA({
                       registerType: 'autoUpdate',
-                      includeAssets: ['homemart-logo.png', 'favicon.ico'],
+                      includeAssets: ['homemart-logo.png', 'apple-touch-icon.png', 'favicon-32.png'],
                       manifest: false,
                       workbox: {
                           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],

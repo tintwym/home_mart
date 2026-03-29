@@ -5,7 +5,7 @@ The **Capacitor iOS shell** (`ios/` + `cap sync`) was **removed** from this repo
 ## Current options
 
 1. **Native iOS (recommended long term)**  
-   Build a Swift/SwiftUI app in Xcode that uses the same **`/api/*`** endpoints as the website and Android.
+   Build a Swift/SwiftUI app in Xcode that uses the same **`/api/*`** (or **`/mapi/*`**) JSON endpoints as the website and Android. See **`docs/MOBILE_APP.md`** for auth and testing.
 
 2. **Restore Capacitor (legacy)**  
    If you still want a WebView-based iOS app, recover `ios/`, `capacitor.config.ts`, and `@capacitor/*` from git history and follow the old Capacitor docs.

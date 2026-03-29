@@ -22,7 +22,7 @@ For Play Store distribution, set **`APP_ANDROID_PLAY_STORE_URL`** in `.env` inst
 
 ## 3. Checklist
 
-- [ ] API base URL in the app matches production (`…/api/`).
+- [ ] API base URL in the app matches production (`…/api/` or `…/mapi/` — same backend; see `docs/MOBILE_APP.md`).
 - [ ] Play listing URL set if you use the store button.
 - [ ] APK path correct if you enable sideload.
 

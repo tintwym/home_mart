@@ -1,15 +1,44 @@
 # Home Mart mobile apps
 
-## Android (native)
+This repository is the **Laravel backend only**. **iOS** (Xcode, Swift/SwiftUI) and **Android** (Kotlin, e.g. Jetpack Compose + Retrofit/OkHttp) live in separate app projects. They call this API over HTTPS.
 
-The production Android app is **native Kotlin + Jetpack Compose**, not a WebView. It talks to this Laravel backend over the **`/api/*`** routes (Sanctum token auth, same data as the website).
+## API base paths (same handlers)
 
-Reference Kotlin sources for copy/paste live in the repo under:
+| Prefix   | Example              | Use case |
+|----------|----------------------|----------|
+| `/api/*` | `GET /api/categories` | Default Laravel convention |
+| `/mapi/*`| `GET /mapi/categories` | Same JSON; optional alias for apps that expect a “mobile” prefix |
 
-- `android-reference/` — minimal sample (data + a few screens)
-- `android-full/` — larger scaffold (domain, Hilt, extra screens)
+Both use the **`api` middleware group** (no browser session, no CSRF). **Do not** POST login to a `web` route from native code or you may get **419**.
 
-Set the app’s base URL to your deployed API, e.g. `https://your-domain.com/api/` (trailing slash matters for Retrofit).
+## Auth (Sanctum personal access tokens)
+
+1. `POST /api/login` or `POST /mapi/login` with JSON body: `{ "email", "password" }`.
+2. Response includes `token` (plain text) and `user`.
+3. Store the token securely (Keychain on iOS, EncryptedSharedPreferences / DataStore on Android).
+4. Send `Authorization: Bearer <token>` on protected routes (e.g. `GET /api/user`).
+
+**Database:** run migrations so `personal_access_tokens` exists (`php artisan migrate`). Without it, login/token creation returns 500.
+
+## iOS (Xcode)
+
+- Use **`URLSession`** (or Alamofire) with `application/json` bodies for POST.
+- Do **not** rely on `X-XSRF-TOKEN` or cookies for the JSON API.
+- Base URL examples: `https://your-domain.com` — request paths `/api/categories`, `/mapi/login`, etc.
+
+## Android (Kotlin)
+
+- Use **Retrofit + OkHttp**; `MediaType` `application/json`; Gson/Kotlinx serialization for models.
+- OkHttp interceptor: add `Authorization: Bearer …` after login.
+- Base URL examples: `https://your-domain.com/api/` (trailing slash matches Retrofit `@GET("categories")`) **or** `https://your-domain.com/` with `@GET("api/categories")` — stay consistent.
+
+## Automated checks (backend)
+
+PHPUnit **`Tests\Feature\Api\MobileNativeApiTest`** asserts `/mapi` matches `/api`, login is not CSRF-rejected (not 419), and Bearer auth works. Run:
+
+```bash
+php artisan test --filter=MobileNativeApiTest
+```
 
 ## Website `/download` page
 

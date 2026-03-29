@@ -1,0 +1,2 @@
+# Built during deploy (npm run build); PHP runtime runs composer for vendor.
+/vendor

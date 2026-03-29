@@ -1,0 +1,25 @@
+{
+    "name": "Home Mart",
+    "short_name": "HomeMart",
+    "description": "Convenient Shopping Online",
+    "theme_color": "#0a0a0a",
+    "background_color": "#0a0a0a",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "start_url": "/",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/homemart-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/homemart-logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

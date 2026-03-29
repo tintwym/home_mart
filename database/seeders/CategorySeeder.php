@@ -22,13 +22,28 @@ class CategorySeeder extends Seeder
             'Coffee Tables',
             'Bookshelves',
             'Outdoor Seating',
+            'Chairs',
+            'Tables',
+            'Lamps',
+            'Decor',
+            'Beds',
+            'Mattresses',
+            'Bedroom Sets',
+            'Bathroom Fixtures',
+            'Kitchen Appliances',
+            'Personal Care',
+            'Cookware',
+            'Cutlery',
+            'Dinnerware',
+            'Glassware',
         ];
 
         foreach ($furniture as $item) {
-            Category::create([
-                'name' => $item,
-                'slug' => Str::slug($item),
-            ]);
+            $slug = Str::slug($item);
+            Category::firstOrCreate(
+                ['slug' => $slug],
+                ['name' => $item],
+            );
         }
     }
 }

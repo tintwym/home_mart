@@ -3,6 +3,7 @@
 use App\Models\Category;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,5 +27,6 @@ return new class extends Migration
         }
 
         (new CategorySeeder)->run();
+        Cache::forget('categories.sidebar');
     }
 };

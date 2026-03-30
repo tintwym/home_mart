@@ -261,17 +261,18 @@
     "twofa.continue": "Continue",
     "twofa.close": "Close",
     "chatbot.title": "Help",
-    "chatbot.welcome": "Hi! Ask me about help, contact, or pricing.",
+    "chatbot.welcome": "Hi! I'm here for questions about shopping, prices, or getting in touch—what do you need?",
     "chatbot.placeholder": "Type a message…",
     "chatbot.open_label": "Open chat",
     "chatbot.close_label": "Close chat",
     "chatbot.panel_label": "Chat",
     "chatbot.input_label": "Message",
     "chatbot.send_label": "Send",
-    "chatbot.help_reply": "You can browse listings, add items to cart, or chat with sellers. Use the menu to go to Cart or Chat.",
+    "chatbot.help_seek_reply": "I'm here to help. In a short sentence, say what's going on—for example: finding listings, cart or checkout, messaging a seller, or your account. Use Chat in the menu to talk with sellers, and Settings for your account. For other issues, use Contact or email from the app.",
+    "chatbot.how_to_reply": "You can browse listings, add items to cart, or chat with sellers. Use the menu to go to Cart or Chat.",
     "chatbot.contact_reply": "For support, please use the contact option in the app or email the store.",
     "chatbot.price_reply": "Prices are set by sellers. Check each listing for the price and use Add to cart or Make offer.",
     "chatbot.support_reply": "For help, go to Settings or contact us through the app.",
     "chatbot.greeting_reply": "Hello! How can I help you today?",
-    "chatbot.default_reply": "Thanks for your message! For specific help, try asking about \"help\", \"contact\", or \"price\"."
+    "chatbot.default_reply": "I didn't quite understand. Try asking how shopping works, about prices, or how to contact us—or describe your situation in one sentence."
 }

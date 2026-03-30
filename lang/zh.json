@@ -261,17 +261,18 @@
     "twofa.continue": "继续",
     "twofa.close": "关闭",
     "chatbot.title": "帮助",
-    "chatbot.welcome": "你好！可以问我关于帮助、联系或价格。",
+    "chatbot.welcome": "你好！购物、价格或联系方面有问题都可以问我—您需要什么？",
     "chatbot.placeholder": "输入消息…",
     "chatbot.open_label": "打开聊天",
     "chatbot.close_label": "关闭聊天",
     "chatbot.panel_label": "聊天",
     "chatbot.input_label": "消息",
     "chatbot.send_label": "发送",
-    "chatbot.help_reply": "您可以浏览商品、加入购物车或与卖家聊天。使用菜单进入购物车或聊天。",
+    "chatbot.help_seek_reply": "我在，可以帮您。请用一两句话说说情况，例如：找不到商品、购物车或下单、联系卖家、账户问题等。菜单里的「聊天」可与卖家沟通，「设置」可管理账户。其他问题请通过应用内的联系或邮件与我们沟通。",
+    "chatbot.how_to_reply": "您可以浏览商品、加入购物车或与卖家聊天。使用菜单进入购物车或聊天。",
     "chatbot.contact_reply": "如需支持，请使用应用内的联系选项或发送邮件。",
     "chatbot.price_reply": "价格由卖家设定。请查看每个商品的标价，使用加入购物车或议价。",
     "chatbot.support_reply": "如需帮助，请前往设置或通过应用联系我们。",
     "chatbot.greeting_reply": "你好！有什么可以帮您？",
-    "chatbot.default_reply": "感谢您的消息！如需具体帮助，可尝试询问「帮助」「联系」或「价格」。"
+    "chatbot.default_reply": "我没太听懂。尝试问「怎么买东西」、价格或联系方式—也可以用一句话描述您遇到的情况。"
 }

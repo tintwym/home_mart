@@ -11,15 +11,82 @@ type Message = {
     at: Date;
 };
 
-const BOT_REPLIES: Record<string, string> = {
-    help: 'chatbot.help_reply',
-    contact: 'chatbot.contact_reply',
-    price: 'chatbot.price_reply',
-    support: 'chatbot.support_reply',
-    hi: 'chatbot.greeting_reply',
-    hello: 'chatbot.greeting_reply',
-    default: 'chatbot.default_reply',
-};
+/** Match whole words for very short triggers so "this" does not match "hi". */
+function textMatchesPhrase(haystack: string, phrase: string): boolean {
+    const p = phrase.trim().toLowerCase();
+    if (p.length === 0) {
+        return false;
+    }
+    if (p.length <= 3) {
+        const escaped = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp(`\\b${escaped}\\b`, 'i').test(haystack);
+    }
+    return haystack.includes(p);
+}
+
+/** More specific phrases first so "I need help" gets support-style help, not the how-to-shop blurb. */
+const BOT_RULES: { phrases: string[]; replyKey: string }[] = [
+    {
+        phrases: [
+            'need help',
+            'help me',
+            'can you help',
+            'please help',
+            'i need assistance',
+            'assist me',
+            'having trouble',
+            'having a problem',
+            'not working',
+            "doesn't work",
+            'something wrong',
+            'stuck',
+            'issue with',
+            'error when',
+            'have a question',
+            'i have a question',
+            'anyone there',
+        ],
+        replyKey: 'chatbot.help_seek_reply',
+    },
+    {
+        phrases: ['contact', 'email', 'reach you', 'reach out'],
+        replyKey: 'chatbot.contact_reply',
+    },
+    {
+        phrases: [
+            'price',
+            'cost',
+            'how much',
+            'expensive',
+            'cheap',
+            'fee',
+        ],
+        replyKey: 'chatbot.price_reply',
+    },
+    {
+        phrases: [
+            'support',
+            'customer service',
+            'talk to someone',
+            'speak to someone',
+        ],
+        replyKey: 'chatbot.support_reply',
+    },
+    { phrases: ['hello', 'hey'], replyKey: 'chatbot.greeting_reply' },
+    { phrases: ['hi'], replyKey: 'chatbot.greeting_reply' },
+    {
+        phrases: [
+            'browse',
+            'shopping',
+            'how do i buy',
+            'how to shop',
+            'add to cart',
+            'find listing',
+            'where is cart',
+        ],
+        replyKey: 'chatbot.how_to_reply',
+    },
+];
 
 export function ChatbotWidget() {
     const { t } = useTranslations();
@@ -41,12 +108,27 @@ export function ChatbotWidget() {
 
     const getBotReply = (userText: string): string => {
         const lower = userText.trim().toLowerCase();
-        for (const [key, replyKey] of Object.entries(BOT_REPLIES)) {
-            if (key !== 'default' && lower.includes(key)) {
-                return t(replyKey);
+        if (lower.length === 0) {
+            return t('chatbot.default_reply');
+        }
+
+        if (/^help\??$|^assist(ance| me)?\??$/i.test(lower.trim())) {
+            return t('chatbot.help_seek_reply');
+        }
+
+        for (const rule of BOT_RULES) {
+            if (
+                rule.phrases.some((phrase) => textMatchesPhrase(lower, phrase))
+            ) {
+                return t(rule.replyKey);
             }
         }
-        return t(BOT_REPLIES.default);
+
+        if (/\bhelp\b/.test(lower)) {
+            return t('chatbot.help_seek_reply');
+        }
+
+        return t('chatbot.default_reply');
     };
 
     const send = () => {

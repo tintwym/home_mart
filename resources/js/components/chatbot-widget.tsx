@@ -53,14 +53,7 @@ const BOT_RULES: { phrases: string[]; replyKey: string }[] = [
         replyKey: 'chatbot.contact_reply',
     },
     {
-        phrases: [
-            'price',
-            'cost',
-            'how much',
-            'expensive',
-            'cheap',
-            'fee',
-        ],
+        phrases: ['price', 'cost', 'how much', 'expensive', 'cheap', 'fee'],
         replyKey: 'chatbot.price_reply',
     },
     {

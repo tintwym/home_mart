@@ -54,7 +54,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
     $listings = rescue(
         fn () => $query->take(100)->get(),
         collect(),
-        report: false
+        report: true
     );
 
     return Inertia::render('dashboard', [

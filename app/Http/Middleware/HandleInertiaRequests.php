@@ -116,7 +116,7 @@ class HandleInertiaRequests extends Middleware
                     fn () => Category::orderBy('name')->get(['id', 'name', 'slug'])
                 ),
                 collect(),
-                report: false
+                report: true
             ),
             'locations' => $locationsResolved,
             'regionLabel' => $regionLabel,

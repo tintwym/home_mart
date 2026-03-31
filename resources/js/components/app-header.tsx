@@ -6,6 +6,7 @@ import {
     Search,
     Settings,
     ShoppingCart,
+    User,
 } from 'lucide-react';
 import { ChevronDown, Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -22,6 +23,10 @@ import {
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -153,7 +158,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="flex min-w-0 flex-[2] basis-0 justify-center md:flex-1 md:basis-auto md:px-4">
                         <form
                             onSubmit={searchFormSubmit}
-                            className="w-full max-w-full min-w-0 md:max-w-lg"
+                            className="w-full max-w-full min-w-0 md:max-w-2xl"
                         >
                             <div className="relative flex min-w-0 items-center overflow-hidden rounded-lg border border-input bg-background">
                                 <input
@@ -313,27 +318,51 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     />
                                 </>
                             ) : (
-                                <div className="flex items-center gap-1.5 md:gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="min-h-[44px] touch-manipulation md:min-h-0"
-                                        asChild
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            className="flex h-11 min-h-[44px] touch-manipulation items-center gap-1.5 rounded-full px-2 pr-2.5 sm:h-9 sm:px-1.5 sm:pr-2"
+                                            aria-label={t('nav.user_menu')}
+                                        >
+                                            <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
+                                                <AvatarFallback className="rounded-full bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                    <User className="size-4 opacity-80" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <ChevronDown className="size-4 opacity-70" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        className="w-56"
+                                        align="end"
                                     >
-                                        <Link href={login()}>
-                                            {t('nav.log_in')}
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="min-h-[44px] touch-manipulation md:min-h-0"
-                                        asChild
-                                    >
-                                        <Link href={register()}>
-                                            {t('nav.register')}
-                                        </Link>
-                                    </Button>
-                                </div>
+                                        <DropdownMenuLabel>
+                                            {t('nav.account_and_lists')}
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuItem asChild>
+                                                <Link
+                                                    className="block w-full cursor-pointer"
+                                                    href={login()}
+                                                    prefetch
+                                                >
+                                                    {t('nav.log_in')}
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link
+                                                    className="block w-full cursor-pointer"
+                                                    href={register()}
+                                                    prefetch
+                                                >
+                                                    {t('nav.register')}
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             )}
                         </div>
                     </div>

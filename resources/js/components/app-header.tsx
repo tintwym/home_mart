@@ -276,17 +276,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 ))}
                             </div>
                         </div>
-                        <div className="hidden md:block">
+                        <div>
                             {auth?.user ? (
                                 <>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 variant="ghost"
-                                                className="flex size-10 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-0.5 md:size-9 md:min-h-9 md:min-w-9"
+                                                className="flex size-10 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-0.5 sm:size-9 sm:min-h-9 sm:min-w-9"
                                                 aria-label={t('nav.user_menu')}
                                             >
-                                                <Avatar className="size-8 overflow-hidden rounded-full md:size-8">
+                                                <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
                                                     <AvatarImage
                                                         src={auth.user.avatar}
                                                         alt={auth.user.name}

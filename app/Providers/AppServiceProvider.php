@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Vercel PHP is serverless: database session/cache/queue force a DB round-trip every request.
-     * If MySQL is slow or misconfigured, the whole site returns 500. Force safe drivers unless opted in.
+     * If the database is slow or misconfigured, the whole site returns 500. Force safe drivers unless opted in.
      * Set ALLOW_VERCEL_DATABASE_DRIVERS=true in Vercel when DB + tables are proven and you need them.
      */
     protected function applyVercelServerlessDefaults(): void

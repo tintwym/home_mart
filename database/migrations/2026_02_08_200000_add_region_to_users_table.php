@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
+
     /**
      * Run the migrations.
      * Region (e.g. SG, MM, US) used to show seller's currency (SGD, MMK, USD).

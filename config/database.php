@@ -19,11 +19,17 @@ return [
     'default' => env('DB_CONNECTION', (function () {
         $url = env('DATABASE_URL') ?: env('DB_URL');
         if (! $url) {
-            // Production environments should use DATABASE_URL with mysql/pgsql, not sqlite.
-            return env('APP_ENV') === 'production' ? 'mysql' : 'sqlite';
+            // Production: expect PostgreSQL (DB_* or DATABASE_URL). Local: SQLite if no URL.
+            return env('APP_ENV') === 'production' ? 'pgsql' : 'sqlite';
         }
 
-        return str_starts_with($url, 'mysql') ? 'mysql' : 'pgsql';
+        $scheme = strtolower((string) (parse_url($url, PHP_URL_SCHEME) ?: ''));
+
+        return match ($scheme) {
+            'mysql', 'mariadb' => 'mysql',
+            'pgsql', 'postgres', 'postgresql' => 'pgsql',
+            default => str_starts_with($url, 'mysql') ? 'mysql' : 'pgsql',
+        };
     })()),
 
     /*

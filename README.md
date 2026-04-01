@@ -27,7 +27,7 @@ Anyone who clones the repo will copy `.env.example` to `.env` and add their own 
 - **Frontend**: React 19 with Inertia.js
 - **Styling**: Tailwind CSS 4
 - **Build Tool**: Vite
-- **Database**: SQLite (development) / MySQL/PostgreSQL (production)
+- **Database**: PostgreSQL (Neon, local Postgres, etc.); automated tests use SQLite in-memory
 
 ## Requirements
 
@@ -35,7 +35,7 @@ Anyone who clones the repo will copy `.env.example` to `.env` and add their own 
 - Composer
 - Node.js 22 or higher
 - NPM
-- Database (SQLite for dev, MySQL/PostgreSQL recommended for production)
+- PostgreSQL 14+ (local install or Neon; see `.env.example`)
 
 ## Local Development Setup
 
@@ -45,7 +45,9 @@ git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
 cd YOUR_REPO
 ```
 
-2. Install dependencies and setup:
+2. Create a PostgreSQL database named `homemart` (e.g. `createdb homemart`, or use Neon and set `DATABASE_URL` in `.env` before migrating). Defaults match `.env.example`.
+
+3. Install dependencies and setup:
 ```bash
 composer setup
 ```
@@ -54,11 +56,11 @@ This command will:
 - Install PHP dependencies
 - Create `.env` file from `.env.example`
 - Generate application key
-- Run database migrations
+- Run database migrations (requires PostgreSQL running and reachable)
 - Install Node.js dependencies
 - Build frontend assets
 
-3. Start the development server:
+4. Start the development server:
 ```bash
 composer dev
 ```
@@ -72,10 +74,10 @@ This runs the Laravel server, queue worker, logs, and Vite dev server concurrent
 ### Deployment Requirements
 
 Your hosting environment must support:
-- PHP 8.2+ with required extensions
+- PHP 8.2+ with required extensions (including **pdo_pgsql** for PostgreSQL)
 - Composer
 - Node.js (for building assets)
-- Database server (MySQL/PostgreSQL recommended)
+- PostgreSQL server (or a hosted URI such as Neon)
 - Web server (Apache/Nginx)
 - SSL certificate (recommended)
 
@@ -153,7 +155,7 @@ This repo includes **`api/index.php`** (loads `public/index.php`) and **`vercel.
    - `APP_KEY` — `php artisan key:generate --show` locally.
    - `APP_ENV=production`, `APP_DEBUG=false`
    - `APP_URL=https://<your-vercel-domain>`
-   - `DATABASE_URL` — Aiven or other MySQL/PostgreSQL URI.
+   - `DATABASE_URL` — PostgreSQL URI (e.g. Neon `postgresql://…?sslmode=require`).
    - Recommended on serverless: `LOG_CHANNEL=stderr`, `CACHE_STORE=array`, `SESSION_DRIVER=cookie` (adjust if you use Redis/database elsewhere).
    - `STRIPE_*`, Cloudinary/S3 vars if you use them.
 
@@ -167,7 +169,7 @@ This repo includes **`api/index.php`** (loads `public/index.php`) and **`vercel.
 5. **Uploads**
    - Use `LISTING_FILESYSTEM_DISK=cloudinary` or `s3`; the serverless filesystem is not durable.
 
-**Troubleshooting:** If you see `could not find driver` with `Connection: sqlite`, production is still using SQLite. Set `DATABASE_URL` to a production MySQL/PostgreSQL URI.
+**Troubleshooting:** If you see `could not find driver` for `pgsql`, the PHP runtime is missing `pdo_pgsql`. On Vercel, use a PHP build that includes PostgreSQL support. If production still uses SQLite, set `DATABASE_URL` (or `DB_CONNECTION=pgsql` and `DB_*`) to your PostgreSQL service.
 
 ### Domain Configuration
 

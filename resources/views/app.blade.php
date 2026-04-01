@@ -15,12 +15,34 @@
                 document.documentElement.classList.toggle('dark', prefersDark);
                 document.documentElement.style.colorScheme = prefersDark ? 'dark' : 'light';
 
-                // Set timezone cookie for region detection (Singapore vs Myanmar)
+                // Timezone hint for region when IP is local/private only (see RegionFromIp)
                 try {
                     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     if (tz) {
                         document.cookie = 'user_timezone=' + encodeURIComponent(tz) + ';path=/;max-age=31536000;samesite=lax';
                     }
+                } catch (e) {}
+
+                // GPS → user_gps cookie (server reverse-geocodes to MM|SG|US). Prompts once per site if allowed.
+                try {
+                    if (!('geolocation' in navigator) || !navigator.geolocation) return;
+                    navigator.geolocation.getCurrentPosition(
+                        function (pos) {
+                            var lat = pos.coords.latitude;
+                            var lng = pos.coords.longitude;
+                            if (lat == null || lng == null || isNaN(lat) || isNaN(lng)) return;
+                            var v = String(lat) + ',' + String(lng);
+                            var m = document.cookie.match(/(?:^|; )user_gps=([^;]*)/);
+                            var prev = m ? decodeURIComponent(m[1]) : '';
+                            document.cookie = 'user_gps=' + encodeURIComponent(v) + ';path=/;max-age=604800;samesite=lax';
+                            if (prev !== v && !sessionStorage.getItem('hm_gps_reload')) {
+                                sessionStorage.setItem('hm_gps_reload', '1');
+                                window.location.reload();
+                            }
+                        },
+                        function () {},
+                        { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+                    );
                 } catch (e) {}
             })();
         </script>

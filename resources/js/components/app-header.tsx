@@ -276,7 +276,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 ))}
                             </div>
                         </div>
-                        <div>
+                        {/* Account menu: desktop/tablet only — mobile uses the hamburger sidebar */}
+                        <div className="hidden md:block">
                             {auth?.user ? (
                                 <>
                                     <DropdownMenu>

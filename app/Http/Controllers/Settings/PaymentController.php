@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Models\LocalPaymentMethod;
 use App\Models\User;
+use App\Services\TwoC2pService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,38 +47,18 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show payment methods page (Stripe cards for Singapore, local methods for Myanmar).
+     * Show payment methods page (2C2P info for Myanmar; Stripe cards for all other regions).
      */
-    public function index(Request $request): Response|RedirectResponse
+    public function index(Request $request, TwoC2pService $twoC2p): Response|RedirectResponse
     {
         $region = \App\Services\RegionFromIp::detect($request);
-        $isSingapore = $region === 'SG';
         $isMyanmar = $region === 'MM';
         $user = $request->user();
 
         $paymentMethods = [];
         $stripePublishableKey = null;
-        $myanmarMethods = [];
 
-        if ($isMyanmar) {
-            $myanmarMethods = $user->localPaymentMethods()
-                ->orderByDesc('is_default')
-                ->orderBy('created_at')
-                ->get()
-                ->map(fn (LocalPaymentMethod $m) => [
-                    'id' => $m->id,
-                    'type' => $m->type,
-                    'type_label' => $m->type_label,
-                    'identifier' => $m->identifier,
-                    'identifier_masked' => strlen($m->identifier) > 4
-                        ? '****'.substr($m->identifier, -4)
-                        : '****'.$m->identifier,
-                    'is_default' => $m->is_default,
-                ])
-                ->all();
-        }
-
-        if ($isSingapore) {
+        if (! $isMyanmar) {
             $key = config('services.stripe.key');
             $secret = config('services.stripe.secret');
             if ($key && $secret) {
@@ -127,8 +107,7 @@ class PaymentController extends Controller
             'region' => $region,
             'paymentMethods' => $paymentMethods,
             'stripePublishableKey' => $stripePublishableKey,
-            'myanmarMethods' => $myanmarMethods,
-            'myanmarTypes' => LocalPaymentMethod::typeLabels(),
+            'twoC2pConfigured' => $isMyanmar && $twoC2p->isConfigured(),
             'flash' => [
                 'status' => $request->session()->get('status'),
                 'error' => $request->session()->get('error'),
@@ -137,30 +116,19 @@ class PaymentController extends Controller
     }
 
     /**
-     * Store a Myanmar local payment method (MPU, KBZ Pay, AYA Pay, Wave Pay, CB Pay).
+     * Legacy route: Myanmar checkout uses 2C2P only (hosted page), not saved local wallet rows.
      */
     public function store(Request $request): RedirectResponse
     {
         $region = \App\Services\RegionFromIp::detect($request);
-        if ($region !== 'MM') {
-            return redirect()->route('payment.index')->with('error', 'Local payment methods are only available for Myanmar.');
+        if ($region === 'MM') {
+            return redirect()->route('payment.index')->with(
+                'error',
+                'Myanmar checkout uses 2C2P on the cart page. Cards and wallets are not saved here.'
+            );
         }
 
-        $valid = $request->validate([
-            'type' => ['required', 'string', 'in:mpu,kbz_pay,aya_pay,wave_pay,cb_pay'],
-            'identifier' => ['required', 'string', 'max:50'],
-        ]);
-
-        $user = $request->user();
-        $isFirst = $user->localPaymentMethods()->count() === 0;
-
-        $user->localPaymentMethods()->create([
-            'type' => $valid['type'],
-            'identifier' => $valid['identifier'],
-            'is_default' => $isFirst,
-        ]);
-
-        return redirect()->route('payment.index')->with('status', 'Payment method added.');
+        return redirect()->route('payment.index')->with('error', 'Invalid request.');
     }
 
     /**
@@ -169,8 +137,8 @@ class PaymentController extends Controller
     public function createSetupIntent(Request $request): JsonResponse
     {
         $region = \App\Services\RegionFromIp::detect($request);
-        if ($region !== 'SG') {
-            return response()->json(['error' => 'Payment methods only available for Singapore.'], 403);
+        if ($region === 'MM') {
+            return response()->json(['error' => 'Card vault is not used for Myanmar (2C2P at checkout).'], 403);
         }
 
         $secret = config('services.stripe.secret');
@@ -200,7 +168,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Set default payment method (Stripe card for Singapore, local method for Myanmar).
+     * Set default payment method (Stripe card only).
      */
     public function setDefault(Request $request): RedirectResponse
     {
@@ -208,79 +176,62 @@ class PaymentController extends Controller
         $user = $request->user();
         $id = $request->payment_method_id;
 
-        if (str_starts_with($id, 'pm_')) {
-            if (! $user->stripe_customer_id) {
-                return redirect()->route('payment.index')->with('error', 'No payment profile found.');
-            }
-            $secret = config('services.stripe.secret');
-            if (! $secret) {
-                return redirect()->route('payment.index')->with('error', 'Stripe is not configured.');
-            }
-            try {
-                Stripe::setApiKey($secret);
-                StripeCustomer::update($user->stripe_customer_id, [
-                    'invoice_settings' => ['default_payment_method' => $id],
-                ]);
-
-                return redirect()->route('payment.index')->with('status', 'Default card updated.');
-            } catch (ApiErrorException $e) {
-                Log::warning('Stripe set default payment method failed: '.$e->getMessage());
-
-                return redirect()->route('payment.index')->with('error', 'Could not set default card.');
-            }
-        }
-
-        $local = $user->localPaymentMethods()->find($id);
-        if (! $local) {
+        if (! str_starts_with($id, 'pm_')) {
             return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
         }
-        $user->localPaymentMethods()->update(['is_default' => false]);
-        $local->update(['is_default' => true]);
 
-        return redirect()->route('payment.index')->with('status', 'Default payment method updated.');
+        if (! $user->stripe_customer_id) {
+            return redirect()->route('payment.index')->with('error', 'No payment profile found.');
+        }
+        $secret = config('services.stripe.secret');
+        if (! $secret) {
+            return redirect()->route('payment.index')->with('error', 'Stripe is not configured.');
+        }
+        try {
+            Stripe::setApiKey($secret);
+            StripeCustomer::update($user->stripe_customer_id, [
+                'invoice_settings' => ['default_payment_method' => $id],
+            ]);
+
+            return redirect()->route('payment.index')->with('status', 'Default card updated.');
+        } catch (ApiErrorException $e) {
+            Log::warning('Stripe set default payment method failed: '.$e->getMessage());
+
+            return redirect()->route('payment.index')->with('error', 'Could not set default card.');
+        }
     }
 
     /**
-     * Detach (delete) a payment method (Stripe or Myanmar local).
+     * Detach (delete) a Stripe payment method.
      */
     public function destroy(Request $request, string $paymentMethodId): RedirectResponse
     {
         $user = $request->user();
 
-        if (str_starts_with($paymentMethodId, 'pm_')) {
-            if (! $user->stripe_customer_id) {
-                return redirect()->route('payment.index')->with('error', 'No payment profile found.');
-            }
-            $secret = config('services.stripe.secret');
-            if (! $secret) {
-                return redirect()->route('payment.index')->with('error', 'Stripe is not configured.');
-            }
-            try {
-                Stripe::setApiKey($secret);
-                $pm = PaymentMethod::retrieve($paymentMethodId);
-                if ($pm->customer !== $user->stripe_customer_id) {
-                    return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
-                }
-                $pm->detach();
-
-                return redirect()->route('payment.index')->with('status', 'Card removed.');
-            } catch (ApiErrorException $e) {
-                Log::warning('Stripe detach payment method failed: '.$e->getMessage());
-
-                return redirect()->route('payment.index')->with('error', 'Could not remove card.');
-            }
-        }
-
-        $local = $user->localPaymentMethods()->find($paymentMethodId);
-        if (! $local) {
+        if (! str_starts_with($paymentMethodId, 'pm_')) {
             return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
         }
-        $local->delete();
-        $newDefault = $user->localPaymentMethods()->first();
-        if ($newDefault && ! $user->localPaymentMethods()->where('is_default', true)->exists()) {
-            $newDefault->update(['is_default' => true]);
-        }
 
-        return redirect()->route('payment.index')->with('status', 'Payment method removed.');
+        if (! $user->stripe_customer_id) {
+            return redirect()->route('payment.index')->with('error', 'No payment profile found.');
+        }
+        $secret = config('services.stripe.secret');
+        if (! $secret) {
+            return redirect()->route('payment.index')->with('error', 'Stripe is not configured.');
+        }
+        try {
+            Stripe::setApiKey($secret);
+            $pm = PaymentMethod::retrieve($paymentMethodId);
+            if ($pm->customer !== $user->stripe_customer_id) {
+                return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
+            }
+            $pm->detach();
+
+            return redirect()->route('payment.index')->with('status', 'Card removed.');
+        } catch (ApiErrorException $e) {
+            Log::warning('Stripe detach payment method failed: '.$e->getMessage());
+
+            return redirect()->route('payment.index')->with('error', 'Could not remove card.');
+        }
     }
 }

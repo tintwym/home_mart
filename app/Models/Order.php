@@ -17,6 +17,7 @@ class Order extends Model
         'status',
         'total',
         'stripe_session_id',
+        'payment_gateway',
     ];
 
     public function user(): BelongsTo

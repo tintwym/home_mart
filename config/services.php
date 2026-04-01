@@ -40,6 +40,15 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    '2c2p' => [
+        'merchant_id' => env('C2C2P_MERCHANT_ID'),
+        'secret_key' => env('C2C2P_SECRET_KEY'),
+        'payment_token_url' => env(
+            'C2C2P_PAYMENT_TOKEN_URL',
+            'https://sandbox-pgw.2c2p.com/payment/4.3/paymentToken'
+        ),
+    ],
+
     'cloudinary' => [
         'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
         'api_key' => env('CLOUDINARY_API_KEY'),

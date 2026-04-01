@@ -16,9 +16,10 @@ class TwoC2pService
 
     public function __construct()
     {
-        $this->merchantId = config('services.2c2p.merchant_id', '');
-        $this->secretKey = config('services.2c2p.secret_key', '');
-        $this->paymentTokenUrl = config('services.2c2p.payment_token_url', 'https://sandbox-pgw.2c2p.com/payment/4.3/paymentToken');
+        $this->merchantId = (string) (config('services.2c2p.merchant_id') ?? '');
+        $this->secretKey = (string) (config('services.2c2p.secret_key') ?? '');
+        $this->paymentTokenUrl = (string) (config('services.2c2p.payment_token_url')
+            ?: 'https://sandbox-pgw.2c2p.com/payment/4.3/paymentToken');
     }
 
     public function isConfigured(): bool
@@ -95,7 +96,7 @@ class TwoC2pService
     }
 
     /**
-     * Decode 2c2p callback/return payload.
+     * Decode 2c2p callback/return payload (JWT, server-to-server).
      *
      * @return array<string, mixed>|null
      */
@@ -108,5 +109,51 @@ class TwoC2pService
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    /**
+     * Decode paymentResponse from frontend redirect (base64url JSON, not JWT).
+     *
+     * @return array<string, mixed>|null
+     *
+     * @see https://developer.2c2p.com/docs/api-payment-response-frontend
+     */
+    public function decodeFrontendPaymentResponse(string $paymentResponse): ?array
+    {
+        $paymentResponse = trim($paymentResponse);
+        if ($paymentResponse === '') {
+            return null;
+        }
+
+        $b64 = strtr($paymentResponse, '-_', '+/');
+        $pad = strlen($b64) % 4;
+        if ($pad !== 0) {
+            $b64 .= str_repeat('=', 4 - $pad);
+        }
+
+        $json = base64_decode($b64, true);
+        if ($json === false) {
+            return null;
+        }
+
+        $data = json_decode($json, true);
+
+        return is_array($data) ? $data : null;
+    }
+
+    /**
+     * Whether a frontend payment response indicates a completed payment.
+     */
+    public function isFrontendPaymentSuccessful(array $decoded): bool
+    {
+        return ($decoded['respCode'] ?? '') === '2000';
+    }
+
+    /**
+     * Whether a backend JWT payment payload indicates success.
+     */
+    public function isBackendPaymentSuccessful(array $decoded): bool
+    {
+        return ($decoded['respCode'] ?? '') === '0000';
     }
 }

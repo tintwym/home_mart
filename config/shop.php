@@ -4,16 +4,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default shop region
+    | Fallback shop region
     |--------------------------------------------------------------------------
     |
-    | Set which region's locations to show. Use SHOP_REGION in .env to
-    | override per deployment (e.g. MM, US). Locations are sorted by
-    | distance from the user's GPS when available.
+    | Priority (RegionFromIp): optional shop_region cookie → browser GPS cookie
+    | (reverse geocode) → public IP geolocation → private IP / timezone / SHOP_REGION.
     |
     */
 
     'default_region' => env('SHOP_REGION', 'MM'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | GPS → region (browser Geolocation API sets user_gps cookie)
+    |--------------------------------------------------------------------------
+    |
+    | Reverse geocode via OpenStreetMap Nominatim (identifying User-Agent required).
+    | If that fails, the nearest entry in gps_fallback_anchors (km) is used.
+    |
+    */
+
+    'gps_region_enabled' => env('SHOP_GPS_REGION_ENABLED', true),
+
+    'gps_fallback_anchors' => [
+        'MM' => ['lat' => 16.8661, 'lng' => 96.1951],
+        'SG' => ['lat' => 1.2789, 'lng' => 103.8507],
+        'US' => ['lat' => 39.8283, 'lng' => -98.5795],
+    ],
 
     /*
     |--------------------------------------------------------------------------

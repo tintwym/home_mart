@@ -22,12 +22,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        $middleware->encryptCookies(except: ['sidebar_state', 'user_timezone']);
+        $middleware->encryptCookies(except: ['sidebar_state', 'user_timezone', 'shop_region', 'user_gps']);
 
         $middleware->web(append: [
             SetLocale::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'checkout/2c2p/callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

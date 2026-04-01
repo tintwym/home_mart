@@ -154,11 +154,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         </Link>
                     </div>
 
-                    {/* Center: search bar (more width on mobile; centered on md+) */}
-                    <div className="flex min-w-0 flex-[2] basis-0 justify-center md:flex-1 md:basis-auto md:px-4">
+                    {/* Center: search bar — grows with row; cap widens on larger breakpoints */}
+                    <div className="flex min-w-0 flex-[2] basis-0 justify-center md:min-w-0 md:flex-1 md:basis-0 md:justify-center md:px-3 lg:px-4">
                         <form
                             onSubmit={searchFormSubmit}
-                            className="w-full max-w-full min-w-0 md:max-w-2xl"
+                            className="w-full max-w-full min-w-0 md:max-w-3xl lg:max-w-4xl"
                         >
                             <div className="relative flex min-w-0 items-center overflow-hidden rounded-lg border border-input bg-background">
                                 <input

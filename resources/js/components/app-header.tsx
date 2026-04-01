@@ -49,7 +49,13 @@ import { useTranslations } from '@/hooks/use-translations';
 import { toUrl } from '@/lib/utils';
 import { dashboard, login, register } from '@/routes';
 import { index as settingsIndex } from '@/routes/settings';
-import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
+import type {
+    BreadcrumbItem,
+    NavItem,
+    SharedCategory,
+    SharedCategoryTreeNode,
+    SharedData,
+} from '@/types';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -65,7 +71,14 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
     const { t, categoryName } = useTranslations();
     const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
-    const { auth, categories = [] } = page.props;
+    const {
+        auth,
+        categories = [],
+        categoryTree = [],
+    } = page.props as SharedData & {
+        categoryTree?: SharedCategoryTreeNode[];
+        categories?: SharedCategory[];
+    };
     const searchQuery =
         (page.props as { searchQuery?: string }).searchQuery ?? '';
     const currentLocation = (() => {
@@ -120,6 +133,18 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             { preserveState: false },
         );
     };
+
+    const topCategoriesForBar: SharedCategory[] =
+        categoryTree.length > 0
+            ? categoryTree
+            : categories.filter((c) => !c.parent_id);
+
+    const sidebarCategoryTree: SharedCategoryTreeNode[] =
+        categoryTree.length > 0
+            ? categoryTree
+            : categories
+                  .filter((c) => !c.parent_id)
+                  .map((c) => ({ ...c, children: [] }));
 
     return (
         <>
@@ -381,7 +406,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 {t('nav.all')}
                             </Link>
                             <nav className="flex shrink-0 items-center gap-2 md:flex-nowrap">
-                                {categories.slice(0, 10).map((cat) => {
+                                {topCategoriesForBar.slice(0, 10).map((cat) => {
                                     const isActive =
                                         currentPath ===
                                         `/categories/${cat.slug}`;
@@ -453,16 +478,48 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
                                         <ul className="ml-2 flex flex-col gap-0.5 border-l border-sidebar-border py-2 pl-4">
-                                            {categories.map((cat) => (
-                                                <li key={cat.id}>
-                                                    <Link
-                                                        href={`/categories/${cat.slug}`}
-                                                        className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
-                                                    >
-                                                        {categoryName(cat)}
-                                                    </Link>
-                                                </li>
-                                            ))}
+                                            {sidebarCategoryTree.map(
+                                                (parent) => (
+                                                    <li key={parent.id}>
+                                                        <Link
+                                                            href={`/categories/${parent.slug}`}
+                                                            className="block min-h-[44px] py-2.5 font-semibold hover:underline active:opacity-80"
+                                                        >
+                                                            {categoryName(
+                                                                parent,
+                                                            )}
+                                                        </Link>
+                                                        {Array.isArray(
+                                                            parent.children,
+                                                        ) &&
+                                                            parent.children
+                                                                .length > 0 && (
+                                                                <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
+                                                                    {parent.children.map(
+                                                                        (
+                                                                            child: SharedCategory,
+                                                                        ) => (
+                                                                            <li
+                                                                                key={
+                                                                                    child.id
+                                                                                }
+                                                                            >
+                                                                                <Link
+                                                                                    href={`/categories/${child.slug}`}
+                                                                                    className="block min-h-[40px] py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:underline active:opacity-80"
+                                                                                >
+                                                                                    {categoryName(
+                                                                                        child,
+                                                                                    )}
+                                                                                </Link>
+                                                                            </li>
+                                                                        ),
+                                                                    )}
+                                                                </ul>
+                                                            )}
+                                                    </li>
+                                                ),
+                                            )}
                                         </ul>
                                     </CollapsibleContent>
                                 </Collapsible>

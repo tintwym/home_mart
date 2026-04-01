@@ -8,6 +8,11 @@ export type SharedCategory = {
     id: string;
     name: string;
     slug: string;
+    parent_id?: string | null;
+};
+
+export type SharedCategoryTreeNode = SharedCategory & {
+    children?: SharedCategory[];
 };
 
 export type SharedLocation = {
@@ -29,6 +34,7 @@ export type SharedData = {
     auth: Auth;
     sidebarOpen: boolean;
     categories: SharedCategory[];
+    categoryTree?: SharedCategoryTreeNode[];
     locations: SharedLocation[];
     regionLabel?: string;
     region?: string;

@@ -15,10 +15,33 @@ class CategoryApiController extends Controller
     {
         $categories = Category::query()
             ->orderBy('name')
-            ->get(['id', 'name', 'slug']);
+            ->get(['id', 'name', 'slug', 'parent_id']);
+
+        $byParent = [];
+        foreach ($categories as $row) {
+            $byParent[$row->parent_id ?? null][] = $row;
+        }
+
+        $tree = [];
+        foreach (($byParent[null] ?? []) as $parent) {
+            $tree[] = [
+                'id' => $parent->id,
+                'name' => $parent->name,
+                'slug' => $parent->slug,
+                'children' => array_map(
+                    fn ($c) => [
+                        'id' => $c->id,
+                        'name' => $c->name,
+                        'slug' => $c->slug,
+                    ],
+                    $byParent[$parent->id] ?? []
+                ),
+            ];
+        }
 
         return response()->json([
             'data' => $categories,
+            'tree' => $tree,
         ]);
     }
 }

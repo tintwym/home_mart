@@ -93,6 +93,41 @@ class HandleInertiaRequests extends Middleware
             ? array_map(fn ($loc) => is_array($loc) ? $loc : ['name' => $loc, 'lat' => null, 'lng' => null], $locations)
             : (config('shop.regions', [])[$region] ?? config('shop.regions', [])[config('shop.default_region', 'MM')] ?? []);
 
+        $categoryRows = rescue(
+            fn () => Cache::remember(
+                'categories.sidebar',
+                now()->addHour(),
+                fn () => Category::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'slug', 'parent_id'])
+            ),
+            collect(),
+            report: true
+        );
+
+        $categoryTree = (function () use ($categoryRows) {
+            if (! $categoryRows || count($categoryRows) === 0) {
+                return [];
+            }
+
+            $byParent = [];
+            foreach ($categoryRows as $row) {
+                $parentId = $row->parent_id ?? null;
+                $byParent[$parentId][] = [
+                    'id' => $row->id,
+                    'name' => $row->name,
+                    'slug' => $row->slug,
+                ];
+            }
+
+            $top = $byParent[null] ?? [];
+            foreach ($top as &$parent) {
+                $parent['children'] = $byParent[$parent['id']] ?? [];
+            }
+
+            return $top;
+        })();
+
         return [
             ...parent::share($request),
             'flash' => [
@@ -109,15 +144,9 @@ class HandleInertiaRequests extends Middleware
                 'chatUnreadCount' => $chatUnreadCount,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'categories' => rescue(
-                fn () => Cache::remember(
-                    'categories.sidebar',
-                    now()->addHour(),
-                    fn () => Category::orderBy('name')->get(['id', 'name', 'slug'])
-                ),
-                collect(),
-                report: true
-            ),
+            // Flat list for existing selects/pages; plus a nested tree for navigation.
+            'categories' => $categoryRows,
+            'categoryTree' => $categoryTree,
             'locations' => $locationsResolved,
             'regionLabel' => $regionLabel,
             'region' => $region,

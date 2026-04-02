@@ -260,7 +260,9 @@ export default function CreateListing({
                         disabled={processing || !canCreate}
                         className="min-h-[44px] w-full touch-manipulation sm:min-h-10 sm:w-auto"
                     >
-                        {processing ? t('common.loading') : t('listing.publish')}
+                        {processing
+                            ? t('common.loading')
+                            : t('listing.publish')}
                     </Button>
                 </form>
             </div>

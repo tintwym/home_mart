@@ -1,5 +1,7 @@
 import { Link, usePage, router } from '@inertiajs/react';
 import {
+    ChevronDown,
+    Layers,
     LogOut,
     Menu,
     MessageCircle,
@@ -8,7 +10,6 @@ import {
     ShoppingCart,
     User,
 } from 'lucide-react';
-import { ChevronDown, Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -409,9 +410,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </Link>
                             <nav className="flex shrink-0 items-center gap-2 md:flex-nowrap">
                                 {topCategoriesForBar.slice(0, 10).map((cat) => {
+                                    const childPathActive =
+                                        Array.isArray(cat.children) &&
+                                        cat.children.some(
+                                            (c) =>
+                                                currentPath ===
+                                                `/categories/${c.slug}`,
+                                        );
                                     const isActive =
                                         currentPath ===
-                                        `/categories/${cat.slug}`;
+                                            `/categories/${cat.slug}` ||
+                                        childPathActive;
                                     const hasChildren =
                                         Array.isArray(cat.children) &&
                                         cat.children.length > 0;
@@ -456,7 +465,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                         className="block w-full cursor-pointer"
                                                         href={`/categories/${cat.slug}`}
                                                     >
-                                                        All {categoryName(cat)}
+                                                        {t('nav.all')}{' '}
+                                                        {categoryName(cat)}
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />

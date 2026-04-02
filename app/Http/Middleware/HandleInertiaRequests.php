@@ -110,17 +110,20 @@ class HandleInertiaRequests extends Middleware
                 return [];
             }
 
+            /** @var array<string, list<array{id: string, name: string, slug: string}>> $byParent */
             $byParent = [];
             foreach ($categoryRows as $row) {
-                $parentId = $row->parent_id ?? null;
-                $byParent[$parentId][] = [
+                $parentKey = ($row->parent_id !== null && $row->parent_id !== '')
+                    ? (string) $row->parent_id
+                    : '';
+                $byParent[$parentKey][] = [
                     'id' => $row->id,
                     'name' => $row->name,
                     'slug' => $row->slug,
                 ];
             }
 
-            $top = $byParent[null] ?? [];
+            $top = $byParent[''] ?? [];
             foreach ($top as &$parent) {
                 $parent['children'] = $byParent[$parent['id']] ?? [];
             }

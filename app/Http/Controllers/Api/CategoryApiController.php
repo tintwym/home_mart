@@ -19,11 +19,14 @@ class CategoryApiController extends Controller
 
         $byParent = [];
         foreach ($categories as $row) {
-            $byParent[$row->parent_id ?? null][] = $row;
+            $parentKey = ($row->parent_id !== null && $row->parent_id !== '')
+                ? (string) $row->parent_id
+                : '';
+            $byParent[$parentKey][] = $row;
         }
 
         $tree = [];
-        foreach (($byParent[null] ?? []) as $parent) {
+        foreach (($byParent[''] ?? []) as $parent) {
             $tree[] = [
                 'id' => $parent->id,
                 'name' => $parent->name,

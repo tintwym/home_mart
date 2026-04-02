@@ -490,7 +490,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetContent
                     side="left"
-                    className="flex h-full w-[min(20rem,85vw)] flex-col items-stretch justify-between bg-sidebar pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] md:w-[min(22rem,85vw)]"
+                    className="flex h-[100dvh] min-h-0 w-[min(20rem,85vw)] touch-pan-y flex-col items-stretch overflow-y-auto overscroll-contain bg-sidebar pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] [-webkit-overflow-scrolling:touch] md:h-full md:w-[min(22rem,85vw)] md:overflow-visible"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
                 >
                     <SheetTitle className="sr-only">
                         {t('nav.navigation_menu')}
@@ -518,8 +519,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </div>
                         </Link>
                     </SheetHeader>
-                    <div className="flex h-full flex-1 flex-col p-4">
-                        <div className="flex flex-1 flex-col gap-1 text-sm">
+                    <div className="flex flex-1 flex-col p-4">
+                        <div className="flex flex-col gap-1 text-sm">
                             {categories.length > 0 && (
                                 <Collapsible
                                     defaultOpen={false}
@@ -537,42 +538,69 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             {sidebarCategoryTree.map(
                                                 (parent) => (
                                                     <li key={parent.id}>
-                                                        <Link
-                                                            href={`/categories/${parent.slug}`}
-                                                            className="block min-h-[44px] py-2.5 font-semibold hover:underline active:opacity-80"
+                                                        <Collapsible
+                                                            defaultOpen={false}
+                                                            className="group/parent"
                                                         >
-                                                            {categoryName(
-                                                                parent,
-                                                            )}
-                                                        </Link>
-                                                        {Array.isArray(
-                                                            parent.children,
-                                                        ) &&
-                                                            parent.children
-                                                                .length > 0 && (
-                                                                <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
-                                                                    {parent.children.map(
-                                                                        (
-                                                                            child: SharedCategory,
-                                                                        ) => (
-                                                                            <li
-                                                                                key={
-                                                                                    child.id
-                                                                                }
-                                                                            >
-                                                                                <Link
-                                                                                    href={`/categories/${child.slug}`}
-                                                                                    className="block min-h-[40px] py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:underline active:opacity-80"
-                                                                                >
-                                                                                    {categoryName(
-                                                                                        child,
-                                                                                    )}
-                                                                                </Link>
-                                                                            </li>
-                                                                        ),
+                                                            <CollapsibleTrigger className="flex min-h-[44px] w-full touch-manipulation items-center justify-between py-2.5 font-semibold hover:underline active:opacity-80">
+                                                                <span>
+                                                                    {categoryName(
+                                                                        parent,
                                                                     )}
+                                                                </span>
+                                                                <ChevronDown className="h-4 w-4 shrink-0 opacity-70 transition-transform duration-200 group-data-[state=open]/parent:rotate-180" />
+                                                            </CollapsibleTrigger>
+                                                            <CollapsibleContent>
+                                                                <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
+                                                                    <li>
+                                                                        <Link
+                                                                            href={`/categories/${parent.slug}`}
+                                                                            onClick={() =>
+                                                                                setSheetOpen(
+                                                                                    false,
+                                                                                )
+                                                                            }
+                                                                            className="block min-h-[40px] py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:underline active:opacity-80"
+                                                                        >
+                                                                            View
+                                                                            all
+                                                                        </Link>
+                                                                    </li>
+                                                                    {Array.isArray(
+                                                                        parent.children,
+                                                                    ) &&
+                                                                        parent
+                                                                            .children
+                                                                            .length >
+                                                                            0 &&
+                                                                        parent.children.map(
+                                                                            (
+                                                                                child: SharedCategory,
+                                                                            ) => (
+                                                                                <li
+                                                                                    key={
+                                                                                        child.id
+                                                                                    }
+                                                                                >
+                                                                                    <Link
+                                                                                        href={`/categories/${child.slug}`}
+                                                                                        onClick={() =>
+                                                                                            setSheetOpen(
+                                                                                                false,
+                                                                                            )
+                                                                                        }
+                                                                                        className="block min-h-[40px] py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:underline active:opacity-80"
+                                                                                    >
+                                                                                        {categoryName(
+                                                                                            child,
+                                                                                        )}
+                                                                                    </Link>
+                                                                                </li>
+                                                                            ),
+                                                                        )}
                                                                 </ul>
-                                                            )}
+                                                            </CollapsibleContent>
+                                                        </Collapsible>
                                                     </li>
                                                 ),
                                             )}
@@ -593,7 +621,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </Link>
                             ))}
                         </div>
-                        <div className="mt-auto flex flex-col gap-0.5 border-t border-sidebar-border pt-2">
+                        <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-2">
                             <div className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 md:hidden">
                                 <span className="text-muted-foreground">
                                     {t('nav.language')}

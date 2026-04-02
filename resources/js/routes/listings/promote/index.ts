@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ListingController::success
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 export const success = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ success.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::success
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 success.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ success.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ListingController::success
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ListingController::success
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

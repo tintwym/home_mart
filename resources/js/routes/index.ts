@@ -122,7 +122,7 @@ register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:33
+* @see routes/web.php:34
 * @route '/locale'
 */
 export const locale = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -136,7 +136,7 @@ locale.definition = {
 } satisfies RouteDefinition<["post"]>
 
 /**
-* @see routes/web.php:33
+* @see routes/web.php:34
 * @route '/locale'
 */
 locale.url = (options?: RouteQueryOptions) => {
@@ -144,7 +144,7 @@ locale.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:33
+* @see routes/web.php:34
 * @route '/locale'
 */
 locale.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -153,7 +153,7 @@ locale.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 })
 
 /**
-* @see routes/web.php:43
+* @see routes/web.php:44
 * @route '/'
 */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -167,7 +167,7 @@ dashboard.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:43
+* @see routes/web.php:44
 * @route '/'
 */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -175,7 +175,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:43
+* @see routes/web.php:44
 * @route '/'
 */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -184,7 +184,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:43
+* @see routes/web.php:44
 * @route '/'
 */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -287,7 +287,7 @@ home.options = (options?: RouteQueryOptions): RouteDefinition<'options'> => ({
 })
 
 /**
-* @see routes/web.php:73
+* @see routes/web.php:74
 * @route '/download'
 */
 export const download = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -301,7 +301,7 @@ download.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:73
+* @see routes/web.php:74
 * @route '/download'
 */
 download.url = (options?: RouteQueryOptions) => {
@@ -309,7 +309,7 @@ download.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:73
+* @see routes/web.php:74
 * @route '/download'
 */
 download.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -318,7 +318,7 @@ download.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:73
+* @see routes/web.php:74
 * @route '/download'
 */
 download.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

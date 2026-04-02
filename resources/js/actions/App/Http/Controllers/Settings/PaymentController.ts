@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::store
-* @see app/Http/Controllers/Settings/PaymentController.php:142
+* @see app/Http/Controllers/Settings/PaymentController.php:121
 * @route '/settings/payment'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -60,7 +60,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::store
-* @see app/Http/Controllers/Settings/PaymentController.php:142
+* @see app/Http/Controllers/Settings/PaymentController.php:121
 * @route '/settings/payment'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -69,7 +69,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::store
-* @see app/Http/Controllers/Settings/PaymentController.php:142
+* @see app/Http/Controllers/Settings/PaymentController.php:121
 * @route '/settings/payment'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -79,7 +79,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::createSetupIntent
-* @see app/Http/Controllers/Settings/PaymentController.php:169
+* @see app/Http/Controllers/Settings/PaymentController.php:137
 * @route '/settings/payment/setup-intent'
 */
 export const createSetupIntent = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -94,7 +94,7 @@ createSetupIntent.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::createSetupIntent
-* @see app/Http/Controllers/Settings/PaymentController.php:169
+* @see app/Http/Controllers/Settings/PaymentController.php:137
 * @route '/settings/payment/setup-intent'
 */
 createSetupIntent.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ createSetupIntent.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::createSetupIntent
-* @see app/Http/Controllers/Settings/PaymentController.php:169
+* @see app/Http/Controllers/Settings/PaymentController.php:137
 * @route '/settings/payment/setup-intent'
 */
 createSetupIntent.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -113,7 +113,7 @@ createSetupIntent.post = (options?: RouteQueryOptions): RouteDefinition<'post'> 
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::setDefault
-* @see app/Http/Controllers/Settings/PaymentController.php:205
+* @see app/Http/Controllers/Settings/PaymentController.php:173
 * @route '/settings/payment/default'
 */
 export const setDefault = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -128,7 +128,7 @@ setDefault.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::setDefault
-* @see app/Http/Controllers/Settings/PaymentController.php:205
+* @see app/Http/Controllers/Settings/PaymentController.php:173
 * @route '/settings/payment/default'
 */
 setDefault.url = (options?: RouteQueryOptions) => {
@@ -137,7 +137,7 @@ setDefault.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::setDefault
-* @see app/Http/Controllers/Settings/PaymentController.php:205
+* @see app/Http/Controllers/Settings/PaymentController.php:173
 * @route '/settings/payment/default'
 */
 setDefault.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -147,7 +147,7 @@ setDefault.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::destroy
-* @see app/Http/Controllers/Settings/PaymentController.php:246
+* @see app/Http/Controllers/Settings/PaymentController.php:207
 * @route '/settings/payment/{paymentMethodId}'
 */
 export const destroy = (args: { paymentMethodId: string | number } | [paymentMethodId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -162,7 +162,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::destroy
-* @see app/Http/Controllers/Settings/PaymentController.php:246
+* @see app/Http/Controllers/Settings/PaymentController.php:207
 * @route '/settings/payment/{paymentMethodId}'
 */
 destroy.url = (args: { paymentMethodId: string | number } | [paymentMethodId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -189,7 +189,7 @@ destroy.url = (args: { paymentMethodId: string | number } | [paymentMethodId: st
 
 /**
 * @see \App\Http\Controllers\Settings\PaymentController::destroy
-* @see app/Http/Controllers/Settings/PaymentController.php:246
+* @see app/Http/Controllers/Settings/PaymentController.php:207
 * @route '/settings/payment/{paymentMethodId}'
 */
 destroy.delete = (args: { paymentMethodId: string | number } | [paymentMethodId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Subcategory;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Cache;
@@ -9,8 +10,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * New production databases often have zero categories after migrate, so the navbar only shows "All".
-     * This runs once: if the table exists but is empty, run the same seeder as local dev.
+     * New production DBs often have no taxonomy after migrate (navbar shows only "All").
+     * Also re-runs when categories exist but subcategories are still empty (e.g. partial deploy).
      */
     public function up(): void
     {
@@ -18,11 +19,11 @@ return new class extends Migration
             return;
         }
 
-        if (! Schema::hasTable('categories')) {
+        if (! Schema::hasTable('categories') || ! Schema::hasTable('subcategories')) {
             return;
         }
 
-        if (Category::query()->exists()) {
+        if (Category::query()->exists() && Subcategory::query()->exists()) {
             return;
         }
 

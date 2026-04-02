@@ -45,7 +45,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ListingController::edit
-* @see app/Http/Controllers/ListingController.php:112
+* @see app/Http/Controllers/ListingController.php:115
 * @route '/listings/{listing}/edit'
 */
 export const edit = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -60,7 +60,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::edit
-* @see app/Http/Controllers/ListingController.php:112
+* @see app/Http/Controllers/ListingController.php:115
 * @route '/listings/{listing}/edit'
 */
 edit.url = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions) => {
@@ -93,7 +93,7 @@ edit.url = (args: { listing: string | { id: string } } | [listing: string | { id
 
 /**
 * @see \App\Http\Controllers\ListingController::edit
-* @see app/Http/Controllers/ListingController.php:112
+* @see app/Http/Controllers/ListingController.php:115
 * @route '/listings/{listing}/edit'
 */
 edit.get = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -103,7 +103,7 @@ edit.get = (args: { listing: string | { id: string } } | [listing: string | { id
 
 /**
 * @see \App\Http\Controllers\ListingController::edit
-* @see app/Http/Controllers/ListingController.php:112
+* @see app/Http/Controllers/ListingController.php:115
 * @route '/listings/{listing}/edit'
 */
 edit.head = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -181,7 +181,7 @@ show.head = (args: { listing: string | { id: string } } | [listing: string | { i
 
 /**
 * @see \App\Http\Controllers\ListingController::promote
-* @see app/Http/Controllers/ListingController.php:185
+* @see app/Http/Controllers/ListingController.php:191
 * @route '/listings/{listing}/promote'
 */
 export const promote = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -196,7 +196,7 @@ promote.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::promote
-* @see app/Http/Controllers/ListingController.php:185
+* @see app/Http/Controllers/ListingController.php:191
 * @route '/listings/{listing}/promote'
 */
 promote.url = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions) => {
@@ -229,7 +229,7 @@ promote.url = (args: { listing: string | { id: string } } | [listing: string | {
 
 /**
 * @see \App\Http\Controllers\ListingController::promote
-* @see app/Http/Controllers/ListingController.php:185
+* @see app/Http/Controllers/ListingController.php:191
 * @route '/listings/{listing}/promote'
 */
 promote.post = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -239,7 +239,7 @@ promote.post = (args: { listing: string | { id: string } } | [listing: string | 
 
 /**
 * @see \App\Http\Controllers\ListingController::promoteSuccess
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 export const promoteSuccess = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -254,7 +254,7 @@ promoteSuccess.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::promoteSuccess
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 promoteSuccess.url = (options?: RouteQueryOptions) => {
@@ -263,7 +263,7 @@ promoteSuccess.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ListingController::promoteSuccess
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 promoteSuccess.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -273,7 +273,7 @@ promoteSuccess.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ListingController::promoteSuccess
-* @see app/Http/Controllers/ListingController.php:234
+* @see app/Http/Controllers/ListingController.php:240
 * @route '/checkout/promote/success'
 */
 promoteSuccess.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -283,7 +283,7 @@ promoteSuccess.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
 
 /**
 * @see \App\Http\Controllers\ListingController::store
-* @see app/Http/Controllers/ListingController.php:76
+* @see app/Http/Controllers/ListingController.php:79
 * @route '/listings'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -298,7 +298,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::store
-* @see app/Http/Controllers/ListingController.php:76
+* @see app/Http/Controllers/ListingController.php:79
 * @route '/listings'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -307,7 +307,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ListingController::store
-* @see app/Http/Controllers/ListingController.php:76
+* @see app/Http/Controllers/ListingController.php:79
 * @route '/listings'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -317,7 +317,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\ListingController::update
-* @see app/Http/Controllers/ListingController.php:122
+* @see app/Http/Controllers/ListingController.php:128
 * @route '/listings/{listing}'
 */
 export const update = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -332,7 +332,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::update
-* @see app/Http/Controllers/ListingController.php:122
+* @see app/Http/Controllers/ListingController.php:128
 * @route '/listings/{listing}'
 */
 update.url = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions) => {
@@ -365,7 +365,7 @@ update.url = (args: { listing: string | { id: string } } | [listing: string | { 
 
 /**
 * @see \App\Http\Controllers\ListingController::update
-* @see app/Http/Controllers/ListingController.php:122
+* @see app/Http/Controllers/ListingController.php:128
 * @route '/listings/{listing}'
 */
 update.put = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -375,7 +375,7 @@ update.put = (args: { listing: string | { id: string } } | [listing: string | { 
 
 /**
 * @see \App\Http\Controllers\ListingController::update
-* @see app/Http/Controllers/ListingController.php:122
+* @see app/Http/Controllers/ListingController.php:128
 * @route '/listings/{listing}'
 */
 update.patch = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -385,7 +385,7 @@ update.patch = (args: { listing: string | { id: string } } | [listing: string | 
 
 /**
 * @see \App\Http\Controllers\ListingController::destroy
-* @see app/Http/Controllers/ListingController.php:161
+* @see app/Http/Controllers/ListingController.php:167
 * @route '/listings/{listing}'
 */
 export const destroy = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -400,7 +400,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\ListingController::destroy
-* @see app/Http/Controllers/ListingController.php:161
+* @see app/Http/Controllers/ListingController.php:167
 * @route '/listings/{listing}'
 */
 destroy.url = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions) => {
@@ -433,7 +433,7 @@ destroy.url = (args: { listing: string | { id: string } } | [listing: string | {
 
 /**
 * @see \App\Http\Controllers\ListingController::destroy
-* @see app/Http/Controllers/ListingController.php:161
+* @see app/Http/Controllers/ListingController.php:167
 * @route '/listings/{listing}'
 */
 destroy.delete = (args: { listing: string | { id: string } } | [listing: string | { id: string } ] | string | { id: string }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

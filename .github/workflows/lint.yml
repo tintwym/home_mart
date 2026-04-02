@@ -28,7 +28,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run Pint
-        run: ./vendor/bin/pint
+        run: ./vendor/bin/pint --test
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -47,6 +47,9 @@ jobs:
       - name: Format Frontend
         run: npm run format:check
 
+      - name: TypeScript
+        run: npm run types
+
       - name: npm audit
         run: npm audit --audit-level=high
 
@@ -54,4 +57,4 @@ jobs:
         run: npm run build
 
       - name: Lint Frontend
-        run: npm run lint
+        run: npm run lint:check

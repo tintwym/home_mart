@@ -1,7 +1,8 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
+import twoc2p from './twoc2p'
 /**
 * @see \App\Http\Controllers\CheckoutController::store
-* @see app/Http/Controllers/CheckoutController.php:14
+* @see app/Http/Controllers/CheckoutController.php:18
 * @route '/checkout'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +17,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\CheckoutController::store
-* @see app/Http/Controllers/CheckoutController.php:14
+* @see app/Http/Controllers/CheckoutController.php:18
 * @route '/checkout'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -25,7 +26,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\CheckoutController::store
-* @see app/Http/Controllers/CheckoutController.php:14
+* @see app/Http/Controllers/CheckoutController.php:18
 * @route '/checkout'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +36,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\CheckoutController::success
-* @see app/Http/Controllers/CheckoutController.php:81
+* @see app/Http/Controllers/CheckoutController.php:155
 * @route '/checkout/success'
 */
 export const success = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -50,7 +51,7 @@ success.definition = {
 
 /**
 * @see \App\Http\Controllers\CheckoutController::success
-* @see app/Http/Controllers/CheckoutController.php:81
+* @see app/Http/Controllers/CheckoutController.php:155
 * @route '/checkout/success'
 */
 success.url = (options?: RouteQueryOptions) => {
@@ -59,7 +60,7 @@ success.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\CheckoutController::success
-* @see app/Http/Controllers/CheckoutController.php:81
+* @see app/Http/Controllers/CheckoutController.php:155
 * @route '/checkout/success'
 */
 success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -69,7 +70,7 @@ success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\CheckoutController::success
-* @see app/Http/Controllers/CheckoutController.php:81
+* @see app/Http/Controllers/CheckoutController.php:155
 * @route '/checkout/success'
 */
 success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -80,6 +81,7 @@ success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 const checkout = {
     store: Object.assign(store, store),
     success: Object.assign(success, success),
+    twoc2p: Object.assign(twoc2p, twoc2p),
 }
 
 export default checkout

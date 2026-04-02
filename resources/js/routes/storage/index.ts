@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
-* @see routes/web.php:18
+* @see routes/web.php:19
 * @route '/storage/listings/{path}'
 */
 export const listings = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ listings.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:18
+* @see routes/web.php:19
 * @route '/storage/listings/{path}'
 */
 listings.url = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -40,7 +40,7 @@ listings.url = (args: { path: string | number } | [path: string | number ] | str
 }
 
 /**
-* @see routes/web.php:18
+* @see routes/web.php:19
 * @route '/storage/listings/{path}'
 */
 listings.get = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -49,7 +49,7 @@ listings.get = (args: { path: string | number } | [path: string | number ] | str
 })
 
 /**
-* @see routes/web.php:18
+* @see routes/web.php:19
 * @route '/storage/listings/{path}'
 */
 listings.head = (args: { path: string | number } | [path: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

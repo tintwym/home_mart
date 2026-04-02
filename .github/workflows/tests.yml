@@ -17,7 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['8.4', '8.5']
+        # ubuntu-latest + setup-php: keep 8.4 as primary; add 8.5 when stable on runners
+        php-version: ['8.4']
 
     steps:
       - name: Checkout code
@@ -49,6 +50,9 @@ jobs:
 
       - name: Generate Wayfinder routes
         run: php artisan wayfinder:generate
+
+      - name: TypeScript
+        run: npm run types
 
       - name: Build Assets
         run: npm run build

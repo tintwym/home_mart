@@ -14,7 +14,7 @@ class Category extends Model
 
     public function subcategories()
     {
-        return $this->hasMany(Subcategory::class)->orderBy('name');
+        return $this->hasMany(Subcategory::class)->orderBy('id');
     }
 
     protected static function booted(): void

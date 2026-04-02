@@ -14,8 +14,8 @@ class CategoryApiController extends Controller
     public function index(): JsonResponse
     {
         $parents = Category::query()
-            ->with(['subcategories' => fn ($q) => $q->orderBy('name')])
-            ->orderBy('name')
+            ->with(['subcategories' => fn ($q) => $q->orderBy('id')])
+            ->orderBy('id')
             ->get(['id', 'name', 'slug']);
 
         $flat = [];

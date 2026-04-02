@@ -95,12 +95,12 @@ class HandleInertiaRequests extends Middleware
 
         [$categoryRows, $categoryTree] = rescue(
             fn () => Cache::remember(
-                'categories.sidebar',
+                'categories.sidebar.v2',
                 now()->addHour(),
                 function () {
                     $parents = Category::query()
-                        ->with(['subcategories' => fn ($q) => $q->orderBy('name')])
-                        ->orderBy('name')
+                        ->with(['subcategories' => fn ($q) => $q->orderBy('id')])
+                        ->orderBy('id')
                         ->get(['id', 'name', 'slug']);
 
                     $flatParents = $parents->map(fn ($c) => [

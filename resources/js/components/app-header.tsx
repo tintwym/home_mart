@@ -134,10 +134,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
         );
     };
 
-    const topCategoriesForBar: SharedCategory[] =
+    const topCategoriesForBar: SharedCategoryTreeNode[] =
         categoryTree.length > 0
             ? categoryTree
-            : categories.filter((c) => !c.category_id);
+            : categories
+                  .filter((c) => !c.category_id)
+                  .map((c) => ({ ...c, children: [] }));
 
     const sidebarCategoryTree: SharedCategoryTreeNode[] =
         categoryTree.length > 0
@@ -406,22 +408,76 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 {t('nav.all')}
                             </Link>
                             <nav className="flex shrink-0 items-center gap-2 md:flex-nowrap">
-                                {topCategoriesForBar.slice(0, 10).map((cat) => {
-                                    const isActive =
+                                {topCategoriesForBar.slice(0, 14).map((cat) => {
+                                    const activeParent =
                                         currentPath ===
                                         `/categories/${cat.slug}`;
+                                    const activeChild = (
+                                        cat.children ?? []
+                                    ).some(
+                                        (child) =>
+                                            currentPath ===
+                                            `/categories/${child.slug}`,
+                                    );
+                                    const isActive =
+                                        activeParent || activeChild;
+
                                     return (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/categories/${cat.slug}`}
-                                            className={`rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
-                                                isActive
-                                                    ? 'bg-primary font-medium text-primary-foreground'
-                                                    : 'text-muted-foreground hover:text-accent-foreground'
-                                            }`}
-                                        >
-                                            {categoryName(cat)}
-                                        </Link>
+                                        <DropdownMenu key={cat.id}>
+                                            <DropdownMenuTrigger asChild>
+                                                <button
+                                                    type="button"
+                                                    className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                                        isActive
+                                                            ? 'bg-primary font-medium text-primary-foreground'
+                                                            : 'text-muted-foreground hover:text-accent-foreground'
+                                                    }`}
+                                                >
+                                                    <span>
+                                                        {categoryName(cat)}
+                                                    </span>
+                                                    <ChevronDown className="h-4 w-4 shrink-0 opacity-70" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                align="start"
+                                                className="w-[14rem]"
+                                            >
+                                                {(cat.children ?? []).length >
+                                                0 ? (
+                                                    <>
+                                                        {cat.children?.map(
+                                                            (child) => (
+                                                                <DropdownMenuItem
+                                                                    key={
+                                                                        child.id
+                                                                    }
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`/categories/${child.slug}`}
+                                                                        className="w-full"
+                                                                    >
+                                                                        {categoryName(
+                                                                            child,
+                                                                        )}
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                            ),
+                                                        )}
+                                                        <DropdownMenuSeparator />
+                                                    </>
+                                                ) : null}
+                                                <DropdownMenuItem asChild>
+                                                    <Link
+                                                        href={`/categories/${cat.slug}`}
+                                                        className="w-full"
+                                                    >
+                                                        View all
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     );
                                 })}
                             </nav>

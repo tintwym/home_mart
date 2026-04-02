@@ -13,37 +13,49 @@ class CategoryApiController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = Category::query()
+        $parents = Category::query()
+            ->with(['subcategories' => fn ($q) => $q->orderBy('name')])
             ->orderBy('name')
-            ->get(['id', 'name', 'slug', 'parent_id']);
+            ->get(['id', 'name', 'slug']);
 
-        $byParent = [];
-        foreach ($categories as $row) {
-            $parentKey = ($row->parent_id !== null && $row->parent_id !== '')
-                ? (string) $row->parent_id
-                : '';
-            $byParent[$parentKey][] = $row;
-        }
-
-        $tree = [];
-        foreach (($byParent[''] ?? []) as $parent) {
-            $tree[] = [
-                'id' => $parent->id,
-                'name' => $parent->name,
-                'slug' => $parent->slug,
-                'children' => array_map(
-                    fn ($c) => [
-                        'id' => $c->id,
-                        'name' => $c->name,
-                        'slug' => $c->slug,
-                    ],
-                    $byParent[$parent->id] ?? []
-                ),
+        $flat = [];
+        foreach ($parents as $cat) {
+            $flat[] = [
+                'id' => $cat->id,
+                'name' => $cat->name,
+                'slug' => $cat->slug,
+                'category_id' => null,
+                'subcategory_id' => null,
             ];
+            foreach ($cat->subcategories as $sub) {
+                $flat[] = [
+                    'id' => $sub->id,
+                    'name' => $sub->name,
+                    'slug' => $sub->slug,
+                    'category_id' => $cat->id,
+                    'subcategory_id' => $sub->id,
+                ];
+            }
         }
+
+        $tree = $parents->map(fn ($parent) => [
+            'id' => $parent->id,
+            'name' => $parent->name,
+            'slug' => $parent->slug,
+            'category_id' => null,
+            'children' => $parent->subcategories->map(
+                fn ($c) => [
+                    'id' => $c->id,
+                    'subcategory_id' => $c->id,
+                    'category_id' => $parent->id,
+                    'name' => $c->name,
+                    'slug' => $c->slug,
+                ]
+            )->values()->all(),
+        ])->values()->all();
 
         return response()->json([
-            'data' => $categories,
+            'data' => $flat,
             'tree' => $tree,
         ]);
     }

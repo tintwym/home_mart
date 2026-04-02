@@ -1,7 +1,5 @@
 import { Link, usePage, router } from '@inertiajs/react';
 import {
-    ChevronDown,
-    Layers,
     LogOut,
     Menu,
     MessageCircle,
@@ -10,6 +8,7 @@ import {
     ShoppingCart,
     User,
 } from 'lucide-react';
+import { ChevronDown, Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -135,18 +134,16 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
         );
     };
 
-    const topCategoriesForBar: SharedCategoryTreeNode[] =
+    const topCategoriesForBar: SharedCategory[] =
         categoryTree.length > 0
             ? categoryTree
-            : categories
-                  .filter((c) => !c.parent_id)
-                  .map((c) => ({ ...c, children: [] }));
+            : categories.filter((c) => !c.category_id);
 
     const sidebarCategoryTree: SharedCategoryTreeNode[] =
         categoryTree.length > 0
             ? categoryTree
             : categories
-                  .filter((c) => !c.parent_id)
+                  .filter((c) => !c.category_id)
                   .map((c) => ({ ...c, children: [] }));
 
     return (
@@ -410,87 +407,21 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </Link>
                             <nav className="flex shrink-0 items-center gap-2 md:flex-nowrap">
                                 {topCategoriesForBar.slice(0, 10).map((cat) => {
-                                    const childPathActive =
-                                        Array.isArray(cat.children) &&
-                                        cat.children.some(
-                                            (c) =>
-                                                currentPath ===
-                                                `/categories/${c.slug}`,
-                                        );
                                     const isActive =
                                         currentPath ===
-                                            `/categories/${cat.slug}` ||
-                                        childPathActive;
-                                    const hasChildren =
-                                        Array.isArray(cat.children) &&
-                                        cat.children.length > 0;
-
-                                    const baseClass = `rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
-                                        isActive
-                                            ? 'bg-primary font-medium text-primary-foreground'
-                                            : 'text-muted-foreground hover:text-accent-foreground'
-                                    }`;
-
-                                    if (!hasChildren) {
-                                        return (
-                                            <Link
-                                                key={cat.id}
-                                                href={`/categories/${cat.slug}`}
-                                                className={baseClass}
-                                            >
-                                                {categoryName(cat)}
-                                            </Link>
-                                        );
-                                    }
-
+                                        `/categories/${cat.slug}`;
                                     return (
-                                        <DropdownMenu key={cat.id}>
-                                            <DropdownMenuTrigger asChild>
-                                                <button
-                                                    type="button"
-                                                    className={`${baseClass} inline-flex items-center gap-1`}
-                                                    aria-label={`${categoryName(
-                                                        cat,
-                                                    )} menu`}
-                                                >
-                                                    <span>
-                                                        {categoryName(cat)}
-                                                    </span>
-                                                    <ChevronDown className="size-4 opacity-70" />
-                                                </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="start">
-                                                <DropdownMenuItem asChild>
-                                                    <Link
-                                                        className="block w-full cursor-pointer"
-                                                        href={`/categories/${cat.slug}`}
-                                                    >
-                                                        {t('nav.all')}{' '}
-                                                        {categoryName(cat)}
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuGroup>
-                                                    {cat.children?.map(
-                                                        (child) => (
-                                                            <DropdownMenuItem
-                                                                key={child.id}
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    className="block w-full cursor-pointer"
-                                                                    href={`/categories/${child.slug}`}
-                                                                >
-                                                                    {categoryName(
-                                                                        child,
-                                                                    )}
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                        ),
-                                                    )}
-                                                </DropdownMenuGroup>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <Link
+                                            key={cat.id}
+                                            href={`/categories/${cat.slug}`}
+                                            className={`rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                                isActive
+                                                    ? 'bg-primary font-medium text-primary-foreground'
+                                                    : 'text-muted-foreground hover:text-accent-foreground'
+                                            }`}
+                                        >
+                                            {categoryName(cat)}
+                                        </Link>
                                     );
                                 })}
                             </nav>

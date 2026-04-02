@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Category extends Model
+class Subcategory extends Model
 {
     use HasUlids;
 
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = ['category_id', 'name', 'slug'];
 
-    public function subcategories()
+    public function category()
     {
-        return $this->hasMany(Subcategory::class);
+        return $this->belongsTo(Category::class);
     }
 
     protected static function booted(): void

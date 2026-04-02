@@ -19,7 +19,7 @@ class UpdateListingRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:5000'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'subcategory_id' => ['required', 'exists:subcategories,id'],
             'condition' => ['required', 'string', 'in:new,like_new,good,fair'],
             'price' => ['required', 'numeric', 'min:0'],
             'image' => ['nullable', 'image', 'max:10240'], // 10 MB

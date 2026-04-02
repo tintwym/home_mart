@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -31,9 +32,11 @@ class ListingApiController extends Controller
         }
 
         if ($slug = $request->query('category')) {
-            $category = Category::where('slug', $slug)->first();
-            if ($category) {
-                $query->where('category_id', $category->id);
+            $sub = Subcategory::where('slug', $slug)->first();
+            if ($sub) {
+                $query->where('subcategory_id', $sub->id);
+            } elseif ($parent = Category::where('slug', $slug)->first()) {
+                $query->whereIn('subcategory_id', $parent->subcategories()->select('id'));
             }
         }
 
@@ -76,7 +79,7 @@ class ListingApiController extends Controller
 
         $related = Listing::query()
             ->with(['category', 'user:id,name,seller_type,region'])
-            ->where('category_id', $listing->category_id)
+            ->where('subcategory_id', $listing->subcategory_id)
             ->where('id', '!=', $listing->id)
             ->latest()
             ->limit(6)

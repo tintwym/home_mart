@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreListingRequest;
 use App\Http\Requests\UpdateListingRequest;
-use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use App\Services\CloudinaryService;
 use App\Services\RegionFromIp;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +28,7 @@ class ListingController extends Controller
         $trendDays = config('shop.trend_duration_days', 7);
 
         $relatedListings = Listing::with(['category', 'user:id,name,seller_type,region'])
-            ->where('category_id', $listing->category_id)
+            ->where('subcategory_id', $listing->subcategory_id)
             ->where('id', '!=', $listing->id)
             ->latest()
             ->limit(6)
@@ -64,7 +64,10 @@ class ListingController extends Controller
         $slotPrice = config('shop.slot_price', 5);
 
         return Inertia::render('listings/create', [
-            'categories' => Category::orderBy('name')->get(),
+            'subcategories' => Subcategory::query()
+                ->with(['category:id,name,slug'])
+                ->orderBy('name')
+                ->get(['id', 'category_id', 'name', 'slug']),
             'listingCount' => $listingCount,
             'maxListingSlots' => $maxSlots,
             'canCreate' => $user->canCreateListing(),
@@ -97,7 +100,7 @@ class ListingController extends Controller
 
         Listing::create([
             'user_id' => $request->user()->id,
-            'category_id' => $data['category_id'],
+            'subcategory_id' => $data['subcategory_id'],
             'title' => $data['title'],
             'description' => $data['description'],
             'condition' => $data['condition'],
@@ -114,8 +117,11 @@ class ListingController extends Controller
         $this->authorize('update', $listing);
 
         return Inertia::render('listings/edit', [
-            'listing' => $listing->load('category'),
-            'categories' => Category::orderBy('name')->get(),
+            'listing' => $listing->load(['category.category']),
+            'subcategories' => Subcategory::query()
+                ->with(['category:id,name,slug'])
+                ->orderBy('name')
+                ->get(['id', 'category_id', 'name', 'slug']),
         ]);
     }
 
@@ -146,7 +152,7 @@ class ListingController extends Controller
         }
 
         $listing->update([
-            'category_id' => $data['category_id'],
+            'subcategory_id' => $data['subcategory_id'],
             'title' => $data['title'],
             'description' => $data['description'],
             'condition' => $data['condition'],

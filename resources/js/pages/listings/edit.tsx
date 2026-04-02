@@ -19,10 +19,11 @@ import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
-type Category = {
+type SubcategoryOption = {
     id: string;
     name: string;
     slug: string;
+    category?: { id: string; name: string; slug: string } | null;
 };
 
 type Listing = {
@@ -34,8 +35,8 @@ type Listing = {
     image_path: string | null;
     image_url: string | null;
     meetup_location: string | null;
-    category_id: string;
-    category?: Category | null;
+    subcategory_id: string;
+    category?: SubcategoryOption | null;
 };
 
 const CONDITION_KEYS: Record<string, string> = {
@@ -62,17 +63,17 @@ function NewImagePreview({ file, label }: { file: File; label: string }) {
 
 type Props = {
     listing: Listing;
-    categories: Category[];
+    subcategories: SubcategoryOption[];
 };
 
-export default function EditListing({ listing, categories }: Props) {
+export default function EditListing({ listing, subcategories }: Props) {
     const { t, categoryName } = useTranslations();
     const { currency } = useCurrency();
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
         title: listing.title,
         description: listing.description,
-        category_id: listing.category_id,
+        subcategory_id: listing.subcategory_id,
         condition: listing.condition,
         price: String(listing.price),
         meetup_location: listing.meetup_location ?? '',
@@ -85,6 +86,14 @@ export default function EditListing({ listing, categories }: Props) {
         { value: 'good', labelKey: CONDITION_KEYS.good },
         { value: 'fair', labelKey: CONDITION_KEYS.fair },
     ];
+
+    const subLabel = (sub: SubcategoryOption) => {
+        const parent = sub.category;
+        if (parent) {
+            return `${categoryName(parent)} › ${categoryName(sub)}`;
+        }
+        return categoryName(sub);
+    };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -158,9 +167,9 @@ export default function EditListing({ listing, categories }: Props) {
                     <div className="space-y-2">
                         <Label>{t('listing.category')}</Label>
                         <Select
-                            value={data.category_id}
+                            value={data.subcategory_id}
                             onValueChange={(value) =>
-                                setData('category_id', value)
+                                setData('subcategory_id', value)
                             }
                         >
                             <SelectTrigger>
@@ -169,14 +178,14 @@ export default function EditListing({ listing, categories }: Props) {
                                 />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories.map((cat) => (
-                                    <SelectItem key={cat.id} value={cat.id}>
-                                        {categoryName(cat)}
+                                {subcategories.map((sub) => (
+                                    <SelectItem key={sub.id} value={sub.id}>
+                                        {subLabel(sub)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors.category_id} />
+                        <InputError message={errors.subcategory_id} />
                     </div>
 
                     <div className="space-y-2">

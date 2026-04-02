@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,9 +29,14 @@ class CheckoutTest extends TestCase
         $user = User::factory()->create();
         $seller = User::factory()->create();
         $category = Category::create(['name' => 'Test', 'slug' => 'test']);
+        $sub = Subcategory::create([
+            'category_id' => $category->id,
+            'name' => 'General',
+            'slug' => 'test-general',
+        ]);
         $listing = Listing::create([
             'user_id' => $seller->id,
-            'category_id' => $category->id,
+            'subcategory_id' => $sub->id,
             'title' => 'Test Item',
             'description' => 'Test',
             'condition' => 'new',

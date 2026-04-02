@@ -8,7 +8,10 @@ export type SharedCategory = {
     id: string;
     name: string;
     slug: string;
-    parent_id?: string | null;
+    /** Parent category ULID when this row is a subcategory; null for top-level categories. */
+    category_id?: string | null;
+    /** Same as `id` for subcategory rows; null for top-level categories. */
+    subcategory_id?: string | null;
 };
 
 export type SharedCategoryTreeNode = SharedCategory & {

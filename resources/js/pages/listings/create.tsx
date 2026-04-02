@@ -19,10 +19,11 @@ import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
-type Category = {
+type SubcategoryOption = {
     id: string;
     name: string;
     slug: string;
+    category?: { id: string; name: string; slug: string } | null;
 };
 
 const CONDITION_KEYS: Record<string, string> = {
@@ -33,7 +34,7 @@ const CONDITION_KEYS: Record<string, string> = {
 };
 
 type Props = {
-    categories: Category[];
+    subcategories: SubcategoryOption[];
     listingCount: number;
     maxListingSlots: number;
     canCreate: boolean;
@@ -41,7 +42,7 @@ type Props = {
 };
 
 export default function CreateListing({
-    categories,
+    subcategories,
     listingCount,
     maxListingSlots,
     canCreate,
@@ -52,7 +53,7 @@ export default function CreateListing({
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        category_id: '',
+        subcategory_id: '',
         condition: 'good',
         price: '',
         meetup_location: '',
@@ -71,6 +72,14 @@ export default function CreateListing({
         post('/listings', {
             forceFormData: true,
         });
+    };
+
+    const subLabel = (sub: SubcategoryOption) => {
+        const parent = sub.category;
+        if (parent) {
+            return `${categoryName(parent)} › ${categoryName(sub)}`;
+        }
+        return categoryName(sub);
     };
 
     return (
@@ -148,9 +157,9 @@ export default function CreateListing({
                     <div className="space-y-2">
                         <Label>{t('listing.category')}</Label>
                         <Select
-                            value={data.category_id}
+                            value={data.subcategory_id}
                             onValueChange={(value) =>
-                                setData('category_id', value)
+                                setData('subcategory_id', value)
                             }
                         >
                             <SelectTrigger>
@@ -159,14 +168,14 @@ export default function CreateListing({
                                 />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories.map((cat) => (
-                                    <SelectItem key={cat.id} value={cat.id}>
-                                        {categoryName(cat)}
+                                {subcategories.map((sub) => (
+                                    <SelectItem key={sub.id} value={sub.id}>
+                                        {subLabel(sub)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors.category_id} />
+                        <InputError message={errors.subcategory_id} />
                     </div>
 
                     <div className="space-y-2">
@@ -195,20 +204,24 @@ export default function CreateListing({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="price">
-                            {t('listing.price', {
-                                symbol: currency.symbol,
-                            })}
-                        </Label>
-                        <Input
-                            id="price"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={data.price}
-                            onChange={(e) => setData('price', e.target.value)}
-                            placeholder={t('listing.price_placeholder')}
-                        />
+                        <Label htmlFor="price">{t('listing.price')}</Label>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">
+                                {currency.symbol}
+                            </span>
+                            <Input
+                                id="price"
+                                type="number"
+                                inputMode="decimal"
+                                min={0}
+                                step="0.01"
+                                value={data.price}
+                                onChange={(e) =>
+                                    setData('price', e.target.value)
+                                }
+                                className="max-w-[12rem]"
+                            />
+                        </div>
                         <InputError message={errors.price} />
                     </div>
 
@@ -223,44 +236,32 @@ export default function CreateListing({
                                 setData('meetup_location', e.target.value)
                             }
                             placeholder={t('listing.meetup_placeholder')}
+                            className="w-full"
                         />
-                        <p className="text-sm text-muted-foreground">
-                            {t('listing.meetup_help')}
-                        </p>
                         <InputError message={errors.meetup_location} />
                     </div>
 
-                    <ImageUploadZone
-                        id="image"
-                        label={t('listing.upload_photos')}
-                        uploadLabel={t('listing.upload_file')}
-                        hintLabel={t('listing.drag_drop_hint')}
-                        value={data.image}
-                        onChange={(file) => setData('image', file)}
-                        accept="image/*"
-                        required
-                        error={errors.image}
-                    />
-
-                    <div className="flex flex-col gap-3 sm:flex-row">
-                        <Button
-                            type="submit"
-                            disabled={processing || !canCreate}
-                            className="min-h-[44px] touch-manipulation sm:min-h-0"
-                        >
-                            {processing
-                                ? t('listing.creating')
-                                : t('listing.create_btn')}
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="min-h-[44px] touch-manipulation sm:min-h-0"
-                            asChild
-                        >
-                            <Link href={dashboard()}>{t('common.cancel')}</Link>
-                        </Button>
+                    <div className="space-y-3">
+                        <ImageUploadZone
+                            id="image"
+                            label={t('listing.image')}
+                            uploadLabel={t('listing.upload_file')}
+                            hintLabel={t('listing.drag_drop_hint')}
+                            value={data.image}
+                            onChange={(file) => setData('image', file)}
+                            accept="image/*"
+                            required
+                            error={errors.image}
+                        />
                     </div>
+
+                    <Button
+                        type="submit"
+                        disabled={processing || !canCreate}
+                        className="min-h-[44px] w-full touch-manipulation sm:min-h-10 sm:w-auto"
+                    >
+                        {processing ? t('common.loading') : t('listing.publish')}
+                    </Button>
                 </form>
             </div>
         </AppLayout>

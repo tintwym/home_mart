@@ -3,21 +3,22 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Subcategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * IKEA-style taxonomy: categories (parents) and subcategories (children).
+     * Child entries may be a string name or [ 'name' => ..., 'slug' => ... ] when the slug must be unique globally.
      */
     public function run(): void
     {
-        // IKEA-style taxonomy (parents + subcategories).
         $tree = [
             'Furniture' => [
                 'Sofas & armchairs',
-                'Beds & mattresses',
+                ['name' => 'Beds & mattresses', 'slug' => 'beds-mattresses-furniture'],
                 'Wardrobes',
                 'Chests of drawers',
                 'Tables & desks',
@@ -37,8 +38,17 @@ class CategorySeeder extends Seeder
                 'Garage & utility storage',
                 'Home office organization',
             ],
+            'Beds & mattresses' => [
+                'Bed frames',
+                'Mattresses',
+                'Bedding sets',
+                'Pillows',
+                'Duvets',
+                'Bed linen',
+            ],
             'Kitchen' => [
                 'Kitchen cabinets & fronts',
+                'Kitchen appliances',
                 'Cookware',
                 'Tableware',
                 'Kitchen utensils',
@@ -72,9 +82,10 @@ class CategorySeeder extends Seeder
             ],
             'Bathroom' => [
                 'Bathroom furniture',
-                'Bathroom accessories',
-                'Bathroom storage',
                 'Shower & bath',
+                'Bathroom accessories',
+                'Towels & mats',
+                'Storage for bathroom',
             ],
             'Laundry & cleaning' => [
                 'Laundry baskets & bags',
@@ -96,6 +107,11 @@ class CategorySeeder extends Seeder
                 'Gardening',
                 'Outdoor storage',
             ],
+            'Electronics & accessories' => [
+                'Charging & cables',
+                'Speakers',
+                'Smart home',
+            ],
             'Tools & hardware' => [
                 'Handles & knobs',
                 'Hinges & fittings',
@@ -111,17 +127,23 @@ class CategorySeeder extends Seeder
 
         foreach ($tree as $parentName => $children) {
             $parentSlug = Str::slug($parentName);
-            /** @var \App\Models\Category $parent */
             $parent = Category::firstOrCreate(
                 ['slug' => $parentSlug],
-                ['name' => $parentName, 'parent_id' => null],
+                ['name' => $parentName],
             );
 
-            foreach ($children as $childName) {
-                $childSlug = Str::slug($childName);
-                Category::firstOrCreate(
+            foreach ($children as $child) {
+                if (is_string($child)) {
+                    $childName = $child;
+                    $childSlug = Str::slug($childName);
+                } else {
+                    $childName = $child['name'];
+                    $childSlug = $child['slug'];
+                }
+
+                Subcategory::firstOrCreate(
                     ['slug' => $childSlug],
-                    ['name' => $childName, 'parent_id' => $parent->id],
+                    ['category_id' => $parent->id, 'name' => $childName],
                 );
             }
         }

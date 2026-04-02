@@ -93,43 +93,45 @@ class HandleInertiaRequests extends Middleware
             ? array_map(fn ($loc) => is_array($loc) ? $loc : ['name' => $loc, 'lat' => null, 'lng' => null], $locations)
             : (config('shop.regions', [])[$region] ?? config('shop.regions', [])[config('shop.default_region', 'MM')] ?? []);
 
-        $categoryRows = rescue(
+        [$categoryRows, $categoryTree] = rescue(
             fn () => Cache::remember(
                 'categories.sidebar',
                 now()->addHour(),
-                fn () => Category::query()
-                    ->orderBy('name')
-                    ->get(['id', 'name', 'slug', 'parent_id'])
+                function () {
+                    $parents = Category::query()
+                        ->with(['subcategories' => fn ($q) => $q->orderBy('name')])
+                        ->orderBy('name')
+                        ->get(['id', 'name', 'slug']);
+
+                    $flatParents = $parents->map(fn ($c) => [
+                        'id' => $c->id,
+                        'name' => $c->name,
+                        'slug' => $c->slug,
+                        'category_id' => null,
+                        'subcategory_id' => null,
+                    ]);
+
+                    $tree = $parents->map(fn ($cat) => [
+                        'id' => $cat->id,
+                        'name' => $cat->name,
+                        'slug' => $cat->slug,
+                        'category_id' => null,
+                        'subcategory_id' => null,
+                        'children' => $cat->subcategories->map(fn ($sub) => [
+                            'id' => $sub->id,
+                            'name' => $sub->name,
+                            'slug' => $sub->slug,
+                            'category_id' => $cat->id,
+                            'subcategory_id' => $sub->id,
+                        ])->all(),
+                    ])->all();
+
+                    return [$flatParents, $tree];
+                }
             ),
-            collect(),
+            [collect(), []],
             report: true
         );
-
-        $categoryTree = (function () use ($categoryRows) {
-            if (! $categoryRows || count($categoryRows) === 0) {
-                return [];
-            }
-
-            /** @var array<string, list<array{id: string, name: string, slug: string}>> $byParent */
-            $byParent = [];
-            foreach ($categoryRows as $row) {
-                $parentKey = ($row->parent_id !== null && $row->parent_id !== '')
-                    ? (string) $row->parent_id
-                    : '';
-                $byParent[$parentKey][] = [
-                    'id' => $row->id,
-                    'name' => $row->name,
-                    'slug' => $row->slug,
-                ];
-            }
-
-            $top = $byParent[''] ?? [];
-            foreach ($top as &$parent) {
-                $parent['children'] = $byParent[$parent['id']] ?? [];
-            }
-
-            return $top;
-        })();
 
         return [
             ...parent::share($request),

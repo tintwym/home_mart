@@ -8,6 +8,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UpgradeController;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -84,11 +85,25 @@ Route::get('/download', function () {
     ]);
 })->name('download');
 
-// Category page: browse listings by category
+// Category page: browse by parent category slug or subcategory slug
 Route::get('/categories/{slug}', function (string $slug) {
+    $sub = Subcategory::where('slug', $slug)->first();
+    if ($sub) {
+        $listings = Listing::with(['category', 'user:id,name,seller_type,region'])
+            ->where('subcategory_id', $sub->id)
+            ->orderByTrendingFirst()
+            ->get();
+
+        return Inertia::render('categories/show', [
+            'category' => $sub,
+            'listings' => $listings,
+        ]);
+    }
+
     $category = Category::where('slug', $slug)->firstOrFail();
+    $subIds = $category->subcategories()->pluck('id');
     $listings = Listing::with(['category', 'user:id,name,seller_type,region'])
-        ->where('category_id', $category->id)
+        ->whereIn('subcategory_id', $subIds)
         ->orderByTrendingFirst()
         ->get();
 

@@ -96,7 +96,7 @@ return [
         'region' => 'ဒေသ',
         'title' => 'ခေါင်းစဉ်',
         'description' => 'ဖော်ပြချက်',
-        'category_id' => 'အမျိုးအစား',
+        'subcategory_id' => 'အမျိုးအစား',
         'condition' => 'အခြေအနေ',
         'price' => 'ဈေးနှုန်း',
         'meetup_location' => 'တွေ့ဆုံမည့်နေရာ',

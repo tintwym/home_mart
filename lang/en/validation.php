@@ -154,7 +154,7 @@ return [
         'region' => 'region',
         'title' => 'title',
         'description' => 'description',
-        'category_id' => 'category',
+        'subcategory_id' => 'category',
         'condition' => 'condition',
         'price' => 'price',
         'meetup_location' => 'meetup location',

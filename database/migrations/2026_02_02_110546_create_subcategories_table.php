@@ -10,19 +10,19 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->foreignUlid('parent_id')
-                ->nullable()
-                ->after('slug')
+        Schema::create('subcategories', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->foreignUlid('category_id')
                 ->constrained('categories')
-                ->nullOnDelete();
+                ->cascadeOnDelete();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('parent_id');
-        });
+        Schema::dropIfExists('subcategories');
     }
 };

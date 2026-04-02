@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,9 +29,14 @@ class CatalogApiTest extends TestCase
     {
         $seller = User::factory()->create();
         $category = Category::create(['name' => 'Cat', 'slug' => 'cat']);
+        $sub = Subcategory::create([
+            'category_id' => $category->id,
+            'name' => 'Sub',
+            'slug' => 'cat-sub',
+        ]);
         Listing::create([
             'user_id' => $seller->id,
-            'category_id' => $category->id,
+            'subcategory_id' => $sub->id,
             'title' => 'Phone',
             'description' => 'Smart',
             'condition' => 'new',
@@ -48,9 +54,14 @@ class CatalogApiTest extends TestCase
     {
         $seller = User::factory()->create();
         $category = Category::create(['name' => 'Cat', 'slug' => 'cat']);
+        $sub = Subcategory::create([
+            'category_id' => $category->id,
+            'name' => 'Sub',
+            'slug' => 'cat-sub',
+        ]);
         $listing = Listing::create([
             'user_id' => $seller->id,
-            'category_id' => $category->id,
+            'subcategory_id' => $sub->id,
             'title' => 'Item',
             'description' => 'Desc',
             'condition' => 'used',
@@ -62,6 +73,6 @@ class CatalogApiTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.id', $listing->id)
             ->assertJsonPath('data.title', 'Item')
-            ->assertJsonPath('data.category.slug', 'cat');
+            ->assertJsonPath('data.category.slug', 'cat-sub');
     }
 }

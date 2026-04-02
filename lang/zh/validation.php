@@ -121,7 +121,7 @@ return [
         'region' => '地区',
         'title' => '标题',
         'description' => '描述',
-        'category_id' => '分类',
+        'subcategory_id' => '分类',
         'condition' => '成色',
         'price' => '价格',
         'meetup_location' => '见面地点',

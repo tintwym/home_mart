@@ -17,7 +17,9 @@ return new class extends Migration
             $table->ulid('id')->primary();
             // Correctly link to the ULID user and category
             $table->foreignUlid('user_id')->constrained()->onDelete('cascade');
-            $table->foreignUlid('category_id')->constrained()->onDelete('cascade');
+            $table->foreignUlid('subcategory_id')
+                ->constrained('subcategories')
+                ->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
             $table->string('condition'); // Used for your "Deal" logic

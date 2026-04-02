@@ -20,7 +20,7 @@ class Listing extends Model
      */
     protected $fillable = [
         'user_id',
-        'category_id',
+        'subcategory_id',
         'title',
         'description',
         'condition',
@@ -81,11 +81,11 @@ class Listing extends Model
     }
 
     /**
-     * Relationship: A listing belongs to a category.
+     * Leaf taxonomy row (subcategory). Exposed as `category` for URLs and UI copy.
      */
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
 
     /**

@@ -142,6 +142,19 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            /*
+             * Neon / PgBouncer (transaction pooler): server-prepared statements can error with
+             * "cached plan must not change result type" after migrations change column layout.
+             * PDO::ATTR_EMULATE_PREPARES avoids that. Set DB_PGSQL_EMULATE_PREPARES=false if you
+             * use a direct (non-pooler) Postgres connection and need native prepares.
+             */
+            'options' => extension_loaded('pdo_pgsql') ? [
+                \PDO::ATTR_EMULATE_PREPARES => (function () {
+                    $raw = env('DB_PGSQL_EMULATE_PREPARES');
+
+                    return $raw === null ? true : filter_var($raw, FILTER_VALIDATE_BOOLEAN);
+                })(),
+            ] : [],
         ],
 
         'sqlsrv' => [

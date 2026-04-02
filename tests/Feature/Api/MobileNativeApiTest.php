@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -90,9 +91,14 @@ class MobileNativeApiTest extends TestCase
     {
         $seller = User::factory()->create();
         $category = Category::create(['name' => 'Cat', 'slug' => 'cat']);
+        $sub = Subcategory::create([
+            'category_id' => $category->id,
+            'name' => 'Sub',
+            'slug' => 'cat-sub',
+        ]);
         Listing::create([
             'user_id' => $seller->id,
-            'category_id' => $category->id,
+            'subcategory_id' => $sub->id,
             'title' => 'Desk',
             'description' => 'Wood',
             'condition' => 'used',

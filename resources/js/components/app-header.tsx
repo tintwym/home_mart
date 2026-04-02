@@ -134,10 +134,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
         );
     };
 
-    const topCategoriesForBar: SharedCategory[] =
+    const topCategoriesForBar: SharedCategoryTreeNode[] =
         categoryTree.length > 0
             ? categoryTree
-            : categories.filter((c) => !c.parent_id);
+            : categories
+                  .filter((c) => !c.parent_id)
+                  .map((c) => ({ ...c, children: [] }));
 
     const sidebarCategoryTree: SharedCategoryTreeNode[] =
         categoryTree.length > 0
@@ -410,18 +412,75 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     const isActive =
                                         currentPath ===
                                         `/categories/${cat.slug}`;
+                                    const hasChildren =
+                                        Array.isArray(cat.children) &&
+                                        cat.children.length > 0;
+
+                                    const baseClass = `rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                        isActive
+                                            ? 'bg-primary font-medium text-primary-foreground'
+                                            : 'text-muted-foreground hover:text-accent-foreground'
+                                    }`;
+
+                                    if (!hasChildren) {
+                                        return (
+                                            <Link
+                                                key={cat.id}
+                                                href={`/categories/${cat.slug}`}
+                                                className={baseClass}
+                                            >
+                                                {categoryName(cat)}
+                                            </Link>
+                                        );
+                                    }
+
                                     return (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/categories/${cat.slug}`}
-                                            className={`rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
-                                                isActive
-                                                    ? 'bg-primary font-medium text-primary-foreground'
-                                                    : 'text-muted-foreground hover:text-accent-foreground'
-                                            }`}
-                                        >
-                                            {categoryName(cat)}
-                                        </Link>
+                                        <DropdownMenu key={cat.id}>
+                                            <DropdownMenuTrigger asChild>
+                                                <button
+                                                    type="button"
+                                                    className={`${baseClass} inline-flex items-center gap-1`}
+                                                    aria-label={`${categoryName(
+                                                        cat,
+                                                    )} menu`}
+                                                >
+                                                    <span>
+                                                        {categoryName(cat)}
+                                                    </span>
+                                                    <ChevronDown className="size-4 opacity-70" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start">
+                                                <DropdownMenuItem asChild>
+                                                    <Link
+                                                        className="block w-full cursor-pointer"
+                                                        href={`/categories/${cat.slug}`}
+                                                    >
+                                                        All {categoryName(cat)}
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuGroup>
+                                                    {cat.children?.map(
+                                                        (child) => (
+                                                            <DropdownMenuItem
+                                                                key={child.id}
+                                                                asChild
+                                                            >
+                                                                <Link
+                                                                    className="block w-full cursor-pointer"
+                                                                    href={`/categories/${child.slug}`}
+                                                                >
+                                                                    {categoryName(
+                                                                        child,
+                                                                    )}
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        ),
+                                                    )}
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     );
                                 })}
                             </nav>

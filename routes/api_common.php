@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\ListingApiController;
+use App\Http\Controllers\Api\UserPasswordApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,8 +23,13 @@ if (! function_exists('registerHomemartJsonApiRoutes')) {
         Route::get('/listings', [ListingApiController::class, 'index']);
         Route::get('/listings/{listing}', [ListingApiController::class, 'show']);
 
-        Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-            return $request->user();
+        Route::middleware('auth:sanctum')->group(function (): void {
+            Route::get('/user', function (Request $request) {
+                return $request->user();
+            });
+
+            Route::put('/password', [UserPasswordApiController::class, 'update']);
+            Route::put('/user/password', [UserPasswordApiController::class, 'update']);
         });
     }
 }

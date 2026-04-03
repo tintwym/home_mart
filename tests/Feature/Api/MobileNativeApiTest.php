@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
@@ -85,6 +86,92 @@ class MobileNativeApiTest extends TestCase
         ])
             ->assertOk()
             ->assertJsonPath('email', $user->email);
+    }
+
+    public function test_mapi_password_requires_bearer_token(): void
+    {
+        $this->putJson('/mapi/password', [
+            'current_password' => 'oldpass1',
+            'password' => 'newpass12',
+            'password_confirmation' => 'newpass12',
+        ])->assertUnauthorized();
+    }
+
+    public function test_mapi_password_rejects_mismatched_password_confirmation(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('secret1234'),
+        ]);
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->putJson('/mapi/password', [
+            'current_password' => 'secret1234',
+            'password' => 'newpass12',
+            'password_confirmation' => 'different12',
+        ], [
+            'Authorization' => 'Bearer '.$token,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['password']);
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('secret1234', $user->password), 'Password must not change when confirmation mismatches.');
+    }
+
+    public function test_mapi_password_rejects_missing_password_confirmation(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('secret1234'),
+        ]);
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->putJson('/mapi/password', [
+            'current_password' => 'secret1234',
+            'password' => 'newpass12',
+        ], [
+            'Authorization' => 'Bearer '.$token,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_mapi_password_updates_with_valid_current_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('secret1234'),
+        ]);
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->putJson('/mapi/password', [
+            'current_password' => 'secret1234',
+            'password' => 'newpass12',
+            'password_confirmation' => 'newpass12',
+        ], [
+            'Authorization' => 'Bearer '.$token,
+        ])
+            ->assertOk()
+            ->assertJsonPath('message', __('Password updated.'));
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('newpass12', $user->password));
+    }
+
+    public function test_mapi_user_password_alias_matches_password_route(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt('secret1234'),
+        ]);
+        $token = $user->createToken('test')->plainTextToken;
+        $headers = ['Authorization' => 'Bearer '.$token];
+        $body = [
+            'current_password' => 'secret1234',
+            'password' => 'another12',
+            'password_confirmation' => 'another12',
+        ];
+
+        $this->putJson('/mapi/user/password', $body, $headers)->assertOk();
+        $user->refresh();
+        $this->assertTrue(Hash::check('another12', $user->password));
     }
 
     public function test_mapi_listings_matches_api_shape(): void

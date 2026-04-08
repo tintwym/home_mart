@@ -6,7 +6,6 @@ use App\Models\Order;
 use App\Services\RegionFromIp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Stripe\Checkout\Session as StripeSession;
@@ -117,7 +116,9 @@ class CheckoutController extends Controller
         $method = $validated['method'];
         $identifier = trim((string) ($validated['identifier'] ?? ''));
 
-        if (($validated['save_method'] ?? false) && $identifier !== '' && in_array($method, ['mpu', 'kbz_pay', 'aya_pay', 'wave_pay', 'cb_pay'], true)) {
+        if (($validated['save_method'] ?? false)
+            && $identifier !== ''
+            && in_array($method, ['mpu', 'kbz_pay', 'aya_pay', 'wave_pay', 'cb_pay'], true)) {
             $exists = $user->localPaymentMethods()
                 ->where('type', $method)
                 ->where('identifier', $identifier)

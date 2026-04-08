@@ -61,15 +61,17 @@ const METHOD_HINT: Partial<Record<MethodKey, string>> = {
     bank: 'Reference / note (optional)',
 };
 
-const METHOD_ICON: Record<MethodKey, React.ComponentType<{ className?: string }>> =
-    {
-        kbz_pay: Wallet,
-        wave_pay: Smartphone,
-        aya_pay: BadgeDollarSign,
-        cb_pay: CreditCard,
-        mpu: Building2,
-        bank: Landmark,
-    };
+const METHOD_ICON: Record<
+    MethodKey,
+    React.ComponentType<{ className?: string }>
+> = {
+    kbz_pay: Wallet,
+    wave_pay: Smartphone,
+    aya_pay: BadgeDollarSign,
+    cb_pay: CreditCard,
+    mpu: Building2,
+    bank: Landmark,
+};
 
 const QR_METHODS: MethodKey[] = ['kbz_pay', 'wave_pay', 'aya_pay', 'cb_pay'];
 
@@ -85,9 +87,11 @@ export default function CheckoutMyanmar({
         const def = savedMethods.find((m) => m.is_default);
         if (!def) return 'kbz_pay';
         const key = def.type as MethodKey;
-        return (['kbz_pay', 'wave_pay', 'aya_pay', 'cb_pay', 'mpu'].includes(key)
-            ? key
-            : 'kbz_pay') as MethodKey;
+        return (
+            ['kbz_pay', 'wave_pay', 'aya_pay', 'cb_pay', 'mpu'].includes(key)
+                ? key
+                : 'kbz_pay'
+        ) as MethodKey;
     });
     const [identifier, setIdentifier] = useState(() => {
         const def = savedMethods.find((m) => m.is_default);
@@ -276,7 +280,9 @@ export default function CheckoutMyanmar({
                                                                         className="text-sm font-medium text-primary underline underline-offset-4"
                                                                         onClick={() =>
                                                                             setShowQr(
-                                                                                (v) =>
+                                                                                (
+                                                                                    v,
+                                                                                ) =>
                                                                                     !v,
                                                                             )
                                                                         }
@@ -325,8 +331,7 @@ export default function CheckoutMyanmar({
 
                                                         <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/10 px-4 py-3">
                                                             <span className="text-sm font-medium">
-                                                                Save this
-                                                                method
+                                                                Save this method
                                                             </span>
                                                             <input
                                                                 type="checkbox"
@@ -358,8 +363,7 @@ export default function CheckoutMyanmar({
 
                                                         <p className="mt-2 text-center text-xs text-muted-foreground">
                                                             Payments are
-                                                            encrypted and
-                                                            secure
+                                                            encrypted and secure
                                                         </p>
                                                     </div>
                                                 </div>
@@ -423,4 +427,3 @@ export default function CheckoutMyanmar({
         </AppLayout>
     );
 }
-

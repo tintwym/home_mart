@@ -210,7 +210,10 @@ export default function ShowListing({
                 )
             ) : auth?.cartListingIds?.includes(listing.id) ? (
                 <Button variant="outline" className="w-full" asChild>
-                    <Link href="/cart" className="inline-flex items-center gap-2">
+                    <Link
+                        href="/cart"
+                        className="inline-flex items-center gap-2"
+                    >
                         <ShoppingCart className="mr-2 size-4" />
                         {t('listing.in_cart')}
                     </Link>
@@ -790,7 +793,9 @@ export default function ShowListing({
                                 <Button
                                     className="min-h-12 flex-1 touch-manipulation"
                                     onClick={() =>
-                                        router.post(`/listings/${listing.id}/chat`)
+                                        router.post(
+                                            `/listings/${listing.id}/chat`,
+                                        )
                                     }
                                 >
                                     {t('listing.make_offer')}

@@ -82,7 +82,9 @@ function AddCardForm({
                 await videoRef.current.play();
             }
         } catch {
-            setError('Could not access camera. Please enter your card manually.');
+            setError(
+                'Could not access camera. Please enter your card manually.',
+            );
             setMode('manual');
         }
     }, []);
@@ -104,7 +106,9 @@ function AddCardForm({
             if (!stripe || !elements) return;
 
             if (!saveCard) {
-                setInfo('Saving is turned off. Turn on “Save my card” to continue.');
+                setInfo(
+                    'Saving is turned off. Turn on “Save my card” to continue.',
+                );
                 return;
             }
 
@@ -138,7 +142,15 @@ function AddCardForm({
 
             onSuccess();
         },
-        [stripe, elements, clientSecret, onSuccess, t, cardholderName, saveCard],
+        [
+            stripe,
+            elements,
+            clientSecret,
+            onSuccess,
+            t,
+            cardholderName,
+            saveCard,
+        ],
     );
 
     const handleScanCard = useCallback(() => {
@@ -206,13 +218,15 @@ function AddCardForm({
                             value={cardholderName}
                             onChange={(e) => setCardholderName(e.target.value)}
                             placeholder="Enter cardholder’s full name"
-                            className="min-h-12 w-full rounded-xl border border-input bg-background px-4 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="min-h-12 w-full rounded-xl border border-input bg-background px-4 text-sm ring-offset-background outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             autoComplete="cc-name"
                         />
                     </div>
 
                     <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
-                        <span className="text-sm font-medium">Save my card</span>
+                        <span className="text-sm font-medium">
+                            Save my card
+                        </span>
                         <input
                             type="checkbox"
                             checked={saveCard}
@@ -285,7 +299,7 @@ function AddCardForm({
                             <div className="absolute inset-0 grid place-items-center">
                                 <div className="h-[62%] w-[78%] rounded-xl border-4 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
                             </div>
-                            <div className="absolute bottom-4 left-4 right-4 text-center text-sm text-white/90">
+                            <div className="absolute right-4 bottom-4 left-4 text-center text-sm text-white/90">
                                 Hold your card inside the frame.
                             </div>
                         </div>
@@ -345,8 +359,7 @@ async function postSetupIntent(): Promise<{
             ok: false,
             status: 419,
             clientSecret: null,
-            error:
-                'Missing CSRF token. If you are running locally, open the app via http://127.0.0.1:8000 (not the Vite 5173 URL).',
+            error: 'Missing CSRF token. If you are running locally, open the app via http://127.0.0.1:8000 (not the Vite 5173 URL).',
         };
     }
 
@@ -487,7 +500,10 @@ export function CardVaultSection({
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteProcessing(false);
-                setDeleteResult({ ok: true, message: 'Card removed successfully.' });
+                setDeleteResult({
+                    ok: true,
+                    message: 'Card removed successfully.',
+                });
                 router.visit(window.location.pathname, {
                     preserveScroll: true,
                     preserveState: true,
@@ -534,7 +550,9 @@ export function CardVaultSection({
                     </Button>
                 ) : (
                     <Button type="button" asChild variant="outline">
-                        <Link href="/settings/payment">{t('settings.payment')}</Link>
+                        <Link href="/settings/payment">
+                            {t('settings.payment')}
+                        </Link>
                     </Button>
                 )}
             </div>
@@ -722,4 +740,3 @@ export function CardVaultSection({
         </div>
     );
 }
-

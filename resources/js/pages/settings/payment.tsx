@@ -142,8 +142,7 @@ export default function PaymentSettings({
                                                             pm.id,
                                                         )}`,
                                                         {
-                                                            preserveScroll:
-                                                                true,
+                                                            preserveScroll: true,
                                                         },
                                                     );
                                                 }}
@@ -181,10 +180,14 @@ export default function PaymentSettings({
                                         className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"
                                         defaultValue="mpu"
                                     >
-                                        <option value="mpu">MPU Debit Card</option>
+                                        <option value="mpu">
+                                            MPU Debit Card
+                                        </option>
                                         <option value="kbz_pay">KBZ Pay</option>
                                         <option value="aya_pay">AYA Pay</option>
-                                        <option value="wave_pay">Wave Pay</option>
+                                        <option value="wave_pay">
+                                            Wave Pay
+                                        </option>
                                         <option value="cb_pay">CB Pay</option>
                                     </select>
                                     <input

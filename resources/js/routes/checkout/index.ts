@@ -1,5 +1,4 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
-import twoc2p from './twoc2p'
 /**
 * @see \App\Http\Controllers\CheckoutController::store
 * @see app/Http/Controllers/CheckoutController.php:18
@@ -81,7 +80,6 @@ success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 const checkout = {
     store: Object.assign(store, store),
     success: Object.assign(success, success),
-    twoc2p: Object.assign(twoc2p, twoc2p),
 }
 
 export default checkout

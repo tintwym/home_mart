@@ -158,85 +158,107 @@ export default function ShowListing({
         post(`/listings/${listing.id}/reviews`);
     };
 
-    /* Sidebar: full-width stacked buttons (Buy first, Add to cart second) */
-    const sidebarBuyerActions = isBusinessSeller ? (
+    /* Sidebar: full-width stacked buttons */
+    const sidebarBuyerActions = (
         <div className="flex flex-col gap-2">
-            {auth?.cartListingIds?.includes(listing.id) ? (
-                <>
-                    <Button className="w-full" asChild>
-                        <Link
-                            href="/cart"
-                            className="inline-flex items-center gap-2"
+            {isBusinessSeller ? (
+                auth?.cartListingIds?.includes(listing.id) ? (
+                    <>
+                        <Button className="w-full" asChild>
+                            <Link
+                                href="/cart"
+                                className="inline-flex items-center gap-2"
+                            >
+                                <ShoppingBag className="mr-2 size-4" />
+                                {t('listing.buy')}
+                            </Link>
+                        </Button>
+                        <Button variant="outline" className="w-full" asChild>
+                            <Link
+                                href="/cart"
+                                className="inline-flex items-center gap-2"
+                            >
+                                <ShoppingCart className="mr-2 size-4" />
+                                {t('listing.in_cart')}
+                            </Link>
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button
+                            className="w-full"
+                            onClick={() =>
+                                router.post(`/listings/${listing.id}/cart`, {
+                                    intent: 'buy',
+                                })
+                            }
                         >
                             <ShoppingBag className="mr-2 size-4" />
                             {t('listing.buy')}
-                        </Link>
-                    </Button>
-                    <Button variant="outline" className="w-full" asChild>
-                        <Link
-                            href="/cart"
-                            className="inline-flex items-center gap-2"
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() =>
+                                router.post(`/listings/${listing.id}/cart`)
+                            }
                         >
                             <ShoppingCart className="mr-2 size-4" />
-                            {t('listing.in_cart')}
-                        </Link>
-                    </Button>
-                </>
-            ) : (
-                <>
-                    <Button
-                        className="w-full"
-                        onClick={() =>
-                            router.post(`/listings/${listing.id}/cart`, {
-                                intent: 'buy',
-                            })
-                        }
-                    >
-                        <ShoppingBag className="mr-2 size-4" />
-                        {t('listing.buy')}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() =>
-                            router.post(`/listings/${listing.id}/cart`)
-                        }
-                    >
+                            {t('listing.add_to_cart')}
+                        </Button>
+                    </>
+                )
+            ) : auth?.cartListingIds?.includes(listing.id) ? (
+                <Button variant="outline" className="w-full" asChild>
+                    <Link href="/cart" className="inline-flex items-center gap-2">
                         <ShoppingCart className="mr-2 size-4" />
-                        {t('listing.add_to_cart')}
-                    </Button>
-                </>
+                        {t('listing.in_cart')}
+                    </Link>
+                </Button>
+            ) : (
+                <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.post(`/listings/${listing.id}/cart`)}
+                >
+                    <ShoppingCart className="mr-2 size-4" />
+                    {t('listing.add_to_cart')}
+                </Button>
             )}
+
+            <Button
+                variant={isBusinessSeller ? 'outline' : 'default'}
+                className="w-full"
+                onClick={() => router.post(`/listings/${listing.id}/chat`)}
+            >
+                {t('listing.make_offer')}
+            </Button>
         </div>
-    ) : (
-        <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => router.post(`/listings/${listing.id}/chat`)}
-        >
-            {t('listing.make_offer')}
-        </Button>
     );
 
-    const sidebarGuestActions = isBusinessSeller ? (
+    const sidebarGuestActions = (
         <div className="flex flex-col gap-2">
-            <Button className="w-full" asChild>
-                <Link href="/login" className="inline-flex items-center gap-2">
-                    <ShoppingBag className="mr-2 size-4" />
-                    {t('listing.sign_in_to_buy')}
-                </Link>
-            </Button>
+            {isBusinessSeller ? (
+                <Button className="w-full" asChild>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2"
+                    >
+                        <ShoppingBag className="mr-2 size-4" />
+                        {t('listing.sign_in_to_buy')}
+                    </Link>
+                </Button>
+            ) : null}
             <Button variant="outline" className="w-full" asChild>
                 <Link href="/login" className="inline-flex items-center gap-2">
                     <ShoppingCart className="mr-2 size-4" />
                     {t('listing.sign_in_to_add_to_cart')}
                 </Link>
             </Button>
+            <Button variant="outline" className="w-full" asChild>
+                <Link href="/login">{t('listing.sign_in_to_make_offer')}</Link>
+            </Button>
         </div>
-    ) : (
-        <Button variant="outline" className="w-full" asChild>
-            <Link href="/login">{t('listing.sign_in_to_make_offer')}</Link>
-        </Button>
     );
 
     return (
@@ -735,15 +757,71 @@ export default function ShowListing({
                 )}
                 {showBuyerActions && !isBusinessSeller && (
                     <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
-                        <Button
-                            variant="outline"
-                            className="min-h-12 flex-1 touch-manipulation"
-                            onClick={() =>
-                                router.post(`/listings/${listing.id}/chat`)
-                            }
-                        >
-                            {t('listing.make_offer')}
-                        </Button>
+                        {auth?.user ? (
+                            <>
+                                {auth.cartListingIds?.includes(listing.id) ? (
+                                    <Button
+                                        variant="outline"
+                                        className="min-h-12 flex-1 touch-manipulation"
+                                        asChild
+                                    >
+                                        <Link
+                                            href="/cart"
+                                            className="inline-flex items-center gap-2"
+                                        >
+                                            <ShoppingCart className="size-4" />
+                                            {t('listing.in_cart')}
+                                        </Link>
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outline"
+                                        className="min-h-12 flex-1 touch-manipulation"
+                                        onClick={() =>
+                                            router.post(
+                                                `/listings/${listing.id}/cart`,
+                                            )
+                                        }
+                                    >
+                                        <ShoppingCart className="mr-2 size-4" />
+                                        {t('listing.add_to_cart')}
+                                    </Button>
+                                )}
+                                <Button
+                                    className="min-h-12 flex-1 touch-manipulation"
+                                    onClick={() =>
+                                        router.post(`/listings/${listing.id}/chat`)
+                                    }
+                                >
+                                    {t('listing.make_offer')}
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    className="min-h-12 flex-1 touch-manipulation"
+                                    asChild
+                                >
+                                    <Link
+                                        href="/login"
+                                        className="inline-flex items-center gap-2"
+                                    >
+                                        <ShoppingCart className="size-4" />
+                                        {t('listing.sign_in_to_add_to_cart')}
+                                    </Link>
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="min-h-12 flex-1 touch-manipulation"
+                                    asChild
+                                >
+                                    <Link href="/login">
+                                        {t('listing.sign_in_to_make_offer')}
+                                    </Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 )}
                 {isGuest && isBusinessSeller && (
@@ -775,19 +853,7 @@ export default function ShowListing({
                         </Button>
                     </div>
                 )}
-                {isGuest && !isBusinessSeller && (
-                    <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
-                        <Button
-                            variant="outline"
-                            className="min-h-12 flex-1 touch-manipulation"
-                            asChild
-                        >
-                            <Link href="/login">
-                                {t('listing.sign_in_to_make_offer')}
-                            </Link>
-                        </Button>
-                    </div>
-                )}
+                {/* guest non-business footer is handled above */}
             </div>
         </AppLayout>
     );

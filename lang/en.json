@@ -31,6 +31,8 @@
     "common.edit": "Edit",
     "common.add": "Add",
     "common.saving": "Saving…",
+    "common.submit": "Submit",
+    "common.submitting": "Submitting…",
 
     "download.title": "Get the Home Mart app",
     "download.description": "The Android app is native (Kotlin) and uses the same backend as this website. Prefer Google Play when available; a direct APK may be offered for testing.",

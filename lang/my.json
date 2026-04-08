@@ -31,6 +31,8 @@
     "common.edit": "ပြင်မည်",
     "common.add": "ထည့်မည်",
     "common.saving": "သိမ်းနေသည်…",
+    "common.submit": "တင်မည်",
+    "common.submitting": "တင်နေသည်…",
 
     "download.title": "Home Mart အက်ပ် ရယူရန်",
     "download.description": "Android အက်ပ်သည် Kotlin နဲ့ ရေးထားသော native အက်ပ်ဖြစ်ပြီး ဝဘ်နဲ့ တူညီတဲ့ server ကို သုံးပါသည်။ Google Play ကို ဦးစားပေးပါ။ စမ်းသပ်ရန် APK တိုက်ရိုက်လည်း ရနိုင်ပါသည်။",

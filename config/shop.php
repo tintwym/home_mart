@@ -16,6 +16,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Private/local IP default region
+    |--------------------------------------------------------------------------
+    |
+    | When running locally (127.0.0.1, 192.168.x, etc.) IP-based geolocation
+    | is not available. Default to a Stripe-capable region unless overridden.
+    |
+    */
+
+    'default_region_private' => env('SHOP_REGION_PRIVATE', 'US'),
+
+    /*
+    |--------------------------------------------------------------------------
     | GPS → region (browser Geolocation API sets user_gps cookie)
     |--------------------------------------------------------------------------
     |

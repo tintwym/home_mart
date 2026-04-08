@@ -204,7 +204,9 @@ export default function CreateListing({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="price">{t('listing.price')}</Label>
+                        <Label htmlFor="price">
+                            {t('listing.price', { symbol: currency.symbol })}
+                        </Label>
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-muted-foreground">
                                 {currency.symbol}
@@ -255,15 +257,25 @@ export default function CreateListing({
                         />
                     </div>
 
-                    <Button
-                        type="submit"
-                        disabled={processing || !canCreate}
-                        className="min-h-[44px] w-full touch-manipulation sm:min-h-10 sm:w-auto"
-                    >
-                        {processing
-                            ? t('common.loading')
-                            : t('listing.publish')}
-                    </Button>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="min-h-[44px] w-full touch-manipulation sm:min-h-10 sm:w-auto"
+                            asChild
+                        >
+                            <Link href={dashboard()}>{t('common.back')}</Link>
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={processing || !canCreate}
+                            className="min-h-[44px] w-full touch-manipulation sm:min-h-10 sm:w-auto"
+                        >
+                            {processing
+                                ? t('common.submitting')
+                                : t('common.submit')}
+                        </Button>
+                    </div>
                 </form>
             </div>
         </AppLayout>

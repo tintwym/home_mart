@@ -45,4 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('settings/payment/setup-intent', [PaymentController::class, 'createSetupIntent'])->name('payment.setup-intent');
     Route::post('settings/payment/default', [PaymentController::class, 'setDefault'])->name('payment.set-default');
     Route::delete('settings/payment/{paymentMethodId}', [PaymentController::class, 'destroy'])->name('payment.destroy');
+
+    // Myanmar local payment methods (saved locally; not Stripe).
+    Route::post('settings/payment/local/default', [PaymentController::class, 'setDefaultLocal'])->name('payment.local.set-default');
+    Route::delete('settings/payment/local/{localPaymentMethodId}', [PaymentController::class, 'destroyLocal'])->name('payment.local.destroy');
 });

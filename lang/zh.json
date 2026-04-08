@@ -31,6 +31,8 @@
     "common.edit": "编辑",
     "common.add": "添加",
     "common.saving": "保存中…",
+    "common.submit": "提交",
+    "common.submitting": "提交中…",
 
     "download.title": "获取 Home Mart 应用",
     "download.description": "Android 客户端为原生应用（Kotlin），与网站共用同一后端。建议优先使用 Google Play；测试时也可使用直接 APK。",

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\LocalPaymentMethod;
 use App\Models\User;
-use App\Services\TwoC2pService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +19,20 @@ use Stripe\Stripe;
 
 class PaymentController extends Controller
 {
+    /**
+     * @return list<string>
+     */
+    protected function myanmarLocalTypes(): array
+    {
+        return [
+            LocalPaymentMethod::TYPE_MPU,
+            LocalPaymentMethod::TYPE_KBZ_PAY,
+            LocalPaymentMethod::TYPE_AYA_PAY,
+            LocalPaymentMethod::TYPE_WAVE_PAY,
+            LocalPaymentMethod::TYPE_CB_PAY,
+        ];
+    }
+
     protected function getOrCreateStripeCustomerId(User $user): ?string
     {
         if ($user->stripe_customer_id) {
@@ -47,15 +61,16 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show payment methods page (2C2P info for Myanmar; Stripe cards for all other regions).
+     * Show payment methods page (Myanmar local methods; Stripe cards for all other regions).
      */
-    public function index(Request $request, TwoC2pService $twoC2p): Response|RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
         $region = \App\Services\RegionFromIp::detect($request);
         $isMyanmar = $region === 'MM';
         $user = $request->user();
 
         $paymentMethods = [];
+        $localPaymentMethods = [];
         $stripePublishableKey = null;
 
         if (! $isMyanmar) {
@@ -101,13 +116,26 @@ class PaymentController extends Controller
                     }
                 }
             }
+        } else {
+            $localPaymentMethods = $user->localPaymentMethods()
+                ->orderByDesc('is_default')
+                ->latest()
+                ->get()
+                ->map(fn (LocalPaymentMethod $pm) => [
+                    'id' => $pm->id,
+                    'type' => $pm->type,
+                    'type_label' => $pm->type_label,
+                    'identifier' => $pm->identifier,
+                    'is_default' => (bool) $pm->is_default,
+                ])
+                ->all();
         }
 
         return Inertia::render('settings/payment', [
             'region' => $region,
             'paymentMethods' => $paymentMethods,
+            'localPaymentMethods' => $localPaymentMethods,
             'stripePublishableKey' => $stripePublishableKey,
-            'twoC2pConfigured' => $isMyanmar && $twoC2p->isConfigured(),
             'flash' => [
                 'status' => $request->session()->get('status'),
                 'error' => $request->session()->get('error'),
@@ -122,13 +150,82 @@ class PaymentController extends Controller
     {
         $region = \App\Services\RegionFromIp::detect($request);
         if ($region === 'MM') {
-            return redirect()->route('payment.index')->with(
-                'error',
-                'Myanmar checkout uses 2C2P on the cart page. Cards and wallets are not saved here.'
-            );
+            $user = $request->user();
+            $validated = $request->validate([
+                'type' => 'required|string|in:'.implode(',', $this->myanmarLocalTypes()),
+                'identifier' => 'required|string|max:50',
+                'is_default' => 'nullable|boolean',
+            ]);
+
+            $makeDefault = (bool) ($validated['is_default'] ?? false);
+            if ($user->localPaymentMethods()->count() === 0) {
+                $makeDefault = true;
+            }
+
+            if ($makeDefault) {
+                $user->localPaymentMethods()->update(['is_default' => false]);
+            }
+
+            $user->localPaymentMethods()->create([
+                'type' => $validated['type'],
+                'identifier' => $validated['identifier'],
+                'is_default' => $makeDefault,
+            ]);
+
+            return redirect()->route('payment.index')->with('status', 'Payment method saved.');
         }
 
         return redirect()->route('payment.index')->with('error', 'Invalid request.');
+    }
+
+    public function setDefaultLocal(Request $request): RedirectResponse
+    {
+        $region = \App\Services\RegionFromIp::detect($request);
+        if ($region !== 'MM') {
+            return redirect()->route('payment.index')->with('error', 'Invalid request.');
+        }
+
+        $validated = $request->validate(['local_payment_method_id' => 'required|string']);
+        $user = $request->user();
+
+        /** @var LocalPaymentMethod|null $pm */
+        $pm = $user->localPaymentMethods()->where('id', $validated['local_payment_method_id'])->first();
+        if (! $pm) {
+            return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
+        }
+
+        $user->localPaymentMethods()->update(['is_default' => false]);
+        $pm->update(['is_default' => true]);
+
+        return redirect()->route('payment.index')->with('status', 'Default payment method updated.');
+    }
+
+    public function destroyLocal(Request $request, string $localPaymentMethodId): RedirectResponse
+    {
+        $region = \App\Services\RegionFromIp::detect($request);
+        if ($region !== 'MM') {
+            return redirect()->route('payment.index')->with('error', 'Invalid request.');
+        }
+
+        $user = $request->user();
+        /** @var LocalPaymentMethod|null $pm */
+        $pm = $user->localPaymentMethods()->where('id', $localPaymentMethodId)->first();
+        if (! $pm) {
+            return redirect()->route('payment.index')->with('error', 'Invalid payment method.');
+        }
+
+        $wasDefault = (bool) $pm->is_default;
+        $pm->delete();
+
+        if ($wasDefault) {
+            /** @var LocalPaymentMethod|null $next */
+            $next = $user->localPaymentMethods()->latest()->first();
+            if ($next) {
+                $next->update(['is_default' => true]);
+            }
+        }
+
+        return redirect()->route('payment.index')->with('status', 'Payment method removed.');
     }
 
     /**

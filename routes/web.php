@@ -136,16 +136,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('chat/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
     Route::get('cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('checkout/mm/pay', [CheckoutController::class, 'payMyanmar'])->name('checkout.mm.pay');
     Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
-    Route::match(['get', 'post'], 'checkout/2c2p/return', [CheckoutController::class, 'twoC2pReturn'])
-        ->name('checkout.twoc2p.return');
     Route::post('listings/{listing}/cart', [CartController::class, 'store'])->name('listings.cart.store');
     Route::delete('listings/{listing}/cart', [CartController::class, 'destroy'])->name('listings.cart.destroy');
     Route::resource('listings', ListingController::class)->except(['index', 'show', 'create', 'edit']);
 });
-
-// 2C2P backend notification (no session / CSRF — validated via JWT in controller)
-Route::post('checkout/2c2p/callback', [CheckoutController::class, 'twoC2pCallback'])
-    ->name('checkout.twoc2p.callback');
 
 require __DIR__.'/settings.php';

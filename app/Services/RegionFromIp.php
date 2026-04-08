@@ -53,7 +53,7 @@ class RegionFromIp
         $ip = $request->ip();
         if (self::isPrivateOrLocalIp($ip)) {
             return self::fromTimezone($request)
-                ?? config('shop.default_region', 'MM');
+                ?? config('shop.default_region_private', 'US');
         }
 
         return self::regionFromPublicIp($ip);

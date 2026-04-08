@@ -72,7 +72,7 @@ function CheckoutForm({ order }: { order: Order }) {
             <PaymentElement
                 options={
                     {
-                        layout: 'accordion',
+                        layout: 'tabs',
                         defaultCollapsed: false,
                         radios: true,
                         spacedAccordionItems: true,
@@ -165,7 +165,7 @@ export default function CheckoutStripe({
     return (
         <AppLayout breadcrumbs={[]}>
             <Head title="Checkout – Pay with Card" />
-            <div className="mx-auto max-w-2xl px-0 pt-6 pb-6 sm:px-2">
+            <div className="mx-auto max-w-5xl px-0 pt-6 pb-8 sm:px-2">
                 <Button
                     variant="ghost"
                     size="sm"
@@ -183,9 +183,30 @@ export default function CheckoutStripe({
 
                 <h1 className="mb-6 text-2xl font-bold">Checkout</h1>
 
-                <div className="grid grid-cols-[minmax(0,280px),1fr] gap-6">
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,520px),minmax(0,1fr)] lg:items-start">
+                    <div className="rounded-xl border border-border bg-card p-6">
+                        <h2 className="mb-4 font-semibold">Payment method</h2>
+                        <p className="mb-5 text-sm text-muted-foreground">
+                            Choose how you’d like to pay.
+                        </p>
+
+                        <Elements
+                            stripe={stripePromise}
+                            options={{
+                                clientSecret,
+                                appearance:
+                                    resolvedAppearance === 'dark'
+                                        ? darkAppearance
+                                        : lightAppearance,
+                                locale: 'en',
+                            }}
+                        >
+                            <CheckoutForm order={order} />
+                        </Elements>
+                    </div>
+
                     <div className="rounded-xl border border-border bg-muted/30 p-6">
-                        <h2 className="mb-4 font-semibold">Order summary</h2>
+                        <h2 className="mb-4 font-semibold">Order Summary</h2>
                         <ul className="space-y-3">
                             {order.items.map((item) => (
                                 <li
@@ -230,29 +251,6 @@ export default function CheckoutStripe({
                                 </span>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="rounded-xl border border-border bg-card p-6">
-                        <h2 className="mb-4 flex items-center gap-2 font-semibold">
-                            <CreditCard className="size-5" />
-                            Payment details
-                        </h2>
-                        <p className="mb-6 text-sm text-muted-foreground">
-                            Pay securely with your card.
-                        </p>
-                        <Elements
-                            stripe={stripePromise}
-                            options={{
-                                clientSecret,
-                                appearance:
-                                    resolvedAppearance === 'dark'
-                                        ? darkAppearance
-                                        : lightAppearance,
-                                locale: 'en',
-                            }}
-                        >
-                            <CheckoutForm order={order} />
-                        </Elements>
                     </div>
                 </div>
             </div>

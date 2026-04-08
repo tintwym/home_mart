@@ -190,7 +190,8 @@ class CheckoutController extends Controller
             ]);
             $user->cartItems()->delete();
 
-            return redirect()->away($session->url);
+            // Inertia requests must use a "location" response for external redirects.
+            return Inertia::location($session->url);
         } catch (ApiErrorException $e) {
             $order->update(['status' => 'completed']);
             $user->cartItems()->delete();

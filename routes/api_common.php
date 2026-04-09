@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryApiController;
+use App\Http\Controllers\Api\ChatApiController;
 use App\Http\Controllers\Api\ListingApiController;
 use App\Http\Controllers\Api\UserPasswordApiController;
 use Illuminate\Http\Request;
@@ -27,6 +28,11 @@ if (! function_exists('registerHomemartJsonApiRoutes')) {
             Route::get('/user', function (Request $request) {
                 return $request->user();
             });
+
+            // Chat (for iOS/Android app) - also available under /mapi/*
+            Route::get('/conversations', [ChatApiController::class, 'conversations']);
+            Route::get('/conversations/{conversation}/messages', [ChatApiController::class, 'messagesIndex']);
+            Route::post('/conversations/{conversation}/messages', [ChatApiController::class, 'messagesStore']);
 
             Route::put('/password', [UserPasswordApiController::class, 'update']);
             Route::put('/user/password', [UserPasswordApiController::class, 'update']);

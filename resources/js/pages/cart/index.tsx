@@ -1,9 +1,10 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
+    Check,
+    ChevronDown,
     Footprints,
     Shirt,
     ShoppingCart,
-    ShieldCheck,
     Smartphone,
     Trash2,
 } from 'lucide-react';
@@ -49,10 +50,15 @@ type Props = {
 export default function CartIndex({ items }: Props) {
     const { post, processing } = useForm();
     const { formatPrice } = useCurrency();
-    const total = items.reduce(
+    const subtotal = items.reduce(
         (sum, item) => sum + Number(item.listing.price),
         0,
     );
+    const region = items[0]?.listing.user?.region ?? undefined;
+    const shippingEstimate = subtotal > 0 ? 5 : 0;
+    const taxEstimate =
+        subtotal > 0 ? Math.round(subtotal * 0.084 * 100) / 100 : 0;
+    const orderTotal = subtotal + shippingEstimate + taxEstimate;
 
     const removeFromCart = (listingId: string) => {
         router.delete(`/listings/${listingId}/cart`);
@@ -69,8 +75,10 @@ export default function CartIndex({ items }: Props) {
     return (
         <AppLayout breadcrumbs={[]}>
             <Head title="Cart" />
-            <div className="mx-auto max-w-2xl px-0 sm:px-2">
-                <h1 className="mb-6 text-xl font-bold">Cart</h1>
+            <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:max-w-7xl lg:px-8">
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                    Shopping Cart
+                </h1>
                 {items.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                         <div className="relative mb-8">
@@ -98,133 +106,247 @@ export default function CartIndex({ items }: Props) {
                         </Link>
                     </div>
                 ) : (
-                    <div className="rounded-xl border border-border/50 bg-muted/30 p-6">
-                        {Object.entries(bySeller).map(
-                            ([sellerId, sellerItems], idx) => (
-                                <div
-                                    key={sellerId}
-                                    className={
-                                        idx > 0
-                                            ? 'mt-6 space-y-4 border-t border-border/50 pt-6'
-                                            : 'space-y-4'
-                                    }
-                                >
-                                    {/* Seller info */}
-                                    {sellerItems[0]?.listing.user && (
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="size-9 shrink-0">
-                                                <AvatarFallback className="text-xs font-medium">
-                                                    {getInitials(
-                                                        sellerItems[0].listing
-                                                            .user.name,
-                                                    )}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <span className="text-sm font-medium">
-                                                {
-                                                    sellerItems[0].listing.user
-                                                        .name
-                                                }
-                                            </span>
-                                        </div>
-                                    )}
+                    <div className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
+                        <section
+                            aria-labelledby="cart-heading"
+                            className="lg:col-span-7"
+                        >
+                            <h2 id="cart-heading" className="sr-only">
+                                Items in your shopping cart
+                            </h2>
 
-                                    {/* Product items - Carousell layout */}
-                                    <div className="space-y-4">
-                                        {sellerItems.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="flex items-center gap-4 rounded-lg border border-border/40 bg-muted/50 p-4"
-                                            >
-                                                <Link
-                                                    href={`/listings/${item.listing.id}`}
-                                                    className="shrink-0 overflow-hidden rounded-lg bg-muted"
-                                                >
-                                                    {(item.listing.image_url ??
-                                                    item.listing.image_path) ? (
-                                                        <img
-                                                            src={
-                                                                item.listing
-                                                                    .image_url ??
-                                                                item.listing
-                                                                    .image_path ??
-                                                                ''
-                                                            }
-                                                            alt=""
-                                                            className="size-20 object-cover sm:size-24"
-                                                        />
-                                                    ) : (
-                                                        <div className="flex size-20 items-center justify-center text-xs text-muted-foreground sm:size-24">
-                                                            —
-                                                        </div>
-                                                    )}
-                                                </Link>
-                                                <div className="min-w-0 flex-1">
-                                                    <Link
-                                                        href={`/listings/${item.listing.id}`}
-                                                        className="line-clamp-2 text-sm font-medium hover:underline"
-                                                    >
-                                                        {item.listing.title}
-                                                    </Link>
-                                                    <p className="mt-0.5 text-xs text-muted-foreground">
-                                                        {CONDITION_LABELS[
-                                                            item.listing
-                                                                .condition ?? ''
-                                                        ] ??
-                                                            item.listing
-                                                                .condition ??
-                                                            '—'}
-                                                    </p>
-                                                    <span className="mt-1.5 inline-flex items-center gap-1 rounded bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground">
-                                                        <ShieldCheck className="size-3.5" />
-                                                        Buyer Protection
-                                                    </span>
-                                                </div>
-                                                <div className="flex shrink-0 items-center gap-2">
-                                                    <p className="text-sm font-semibold">
-                                                        {formatPrice(
-                                                            item.listing.price,
-                                                            item.listing.user
-                                                                ?.region,
+                            {Object.entries(bySeller).map(
+                                ([sellerId, sellerItems], idx) => (
+                                    <div
+                                        key={sellerId}
+                                        className={
+                                            idx > 0
+                                                ? 'mt-10 border-t border-border pt-10'
+                                                : ''
+                                        }
+                                    >
+                                        {/* Seller info */}
+                                        {sellerItems[0]?.listing.user && (
+                                            <div className="flex items-center gap-3">
+                                                <Avatar className="size-9 shrink-0">
+                                                    <AvatarFallback className="text-xs font-medium">
+                                                        {getInitials(
+                                                            sellerItems[0]
+                                                                .listing.user
+                                                                .name,
                                                         )}
-                                                    </p>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="size-8 text-destructive hover:text-destructive"
-                                                        onClick={() =>
-                                                            removeFromCart(
-                                                                item.listing.id,
-                                                            )
-                                                        }
-                                                        aria-label="Remove from cart"
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <span className="text-sm font-medium">
+                                                    {
+                                                        sellerItems[0].listing
+                                                            .user.name
+                                                    }
+                                                </span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ),
-                        )}
+                                        )}
 
-                        {/* Summary + Checkout - exactly like reference */}
-                        <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-5">
-                            <p className="text-sm text-muted-foreground">
-                                {items.length}{' '}
-                                {items.length === 1 ? 'item' : 'items'} •{' '}
-                                {formatPrice(total)}
-                            </p>
-                            <Button
-                                type="button"
-                                className="min-h-11 px-6 font-semibold"
-                                disabled={processing}
-                                onClick={() => post('/checkout')}
+                                        <ul
+                                            role="list"
+                                            className="mt-4 divide-y divide-border border-t border-b border-border"
+                                        >
+                                            {sellerItems.map(
+                                                (item, productIdx) => (
+                                                    <li
+                                                        key={item.id}
+                                                        className="flex py-6 sm:py-10"
+                                                    >
+                                                        <Link
+                                                            href={`/listings/${item.listing.id}`}
+                                                            className="shrink-0 overflow-hidden rounded-md bg-muted"
+                                                        >
+                                                            {(item.listing
+                                                                .image_url ??
+                                                            item.listing
+                                                                .image_path) ? (
+                                                                <img
+                                                                    src={
+                                                                        item
+                                                                            .listing
+                                                                            .image_url ??
+                                                                        item
+                                                                            .listing
+                                                                            .image_path ??
+                                                                        ''
+                                                                    }
+                                                                    alt=""
+                                                                    className="size-24 object-cover sm:size-48"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex size-24 items-center justify-center text-xs text-muted-foreground sm:size-48">
+                                                                    —
+                                                                </div>
+                                                            )}
+                                                        </Link>
+                                                        <div className="ml-4 flex flex-1 flex-col justify-between sm:ml-6">
+                                                            <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
+                                                                <div>
+                                                                    <div className="flex justify-between">
+                                                                        <h3 className="text-sm">
+                                                                            <Link
+                                                                                href={`/listings/${item.listing.id}`}
+                                                                                className="font-medium text-foreground hover:underline"
+                                                                            >
+                                                                                {
+                                                                                    item
+                                                                                        .listing
+                                                                                        .title
+                                                                                }
+                                                                            </Link>
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div className="mt-1 flex text-sm">
+                                                                        <p className="text-muted-foreground">
+                                                                            {CONDITION_LABELS[
+                                                                                item
+                                                                                    .listing
+                                                                                    .condition ??
+                                                                                    ''
+                                                                            ] ??
+                                                                                item
+                                                                                    .listing
+                                                                                    .condition ??
+                                                                                '—'}
+                                                                        </p>
+                                                                        <p className="ml-4 border-l border-border pl-4 text-muted-foreground">
+                                                                            Buyer
+                                                                            Protection
+                                                                        </p>
+                                                                    </div>
+                                                                    <p className="mt-1 text-sm font-medium">
+                                                                        {formatPrice(
+                                                                            item
+                                                                                .listing
+                                                                                .price,
+                                                                            item
+                                                                                .listing
+                                                                                .user
+                                                                                ?.region,
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div className="mt-4 sm:mt-0 sm:pr-9">
+                                                                    <div className="grid w-full max-w-16 grid-cols-1">
+                                                                        <select
+                                                                            name={`quantity-${productIdx}`}
+                                                                            aria-label={`Quantity, ${item.listing.title}`}
+                                                                            disabled
+                                                                            value={
+                                                                                1
+                                                                            }
+                                                                            className="col-start-1 row-start-1 appearance-none rounded-md bg-background py-1.5 pr-8 pl-3 text-base outline-1 -outline-offset-1 outline-border focus:outline-2 focus:-outline-offset-2 focus:outline-primary disabled:opacity-70 sm:text-sm/6"
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    1
+                                                                                }
+                                                                            >
+                                                                                1
+                                                                            </option>
+                                                                        </select>
+                                                                        <ChevronDown className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-muted-foreground sm:size-4" />
+                                                                    </div>
+
+                                                                    <div className="absolute top-0 right-0">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="-m-2 inline-flex p-2 text-muted-foreground hover:text-foreground"
+                                                                            onClick={() =>
+                                                                                removeFromCart(
+                                                                                    item
+                                                                                        .listing
+                                                                                        .id,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <span className="sr-only">
+                                                                                Remove
+                                                                            </span>
+                                                                            <Trash2 className="size-5" />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <p className="mt-4 flex space-x-2 text-sm text-foreground">
+                                                                <Check className="size-5 shrink-0 text-green-500" />
+                                                                <span>
+                                                                    In stock
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </div>
+                                ),
+                            )}
+                        </section>
+
+                        <section
+                            aria-labelledby="summary-heading"
+                            className="mt-16 rounded-lg bg-muted/30 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8"
+                        >
+                            <h2
+                                id="summary-heading"
+                                className="text-lg font-medium"
                             >
-                                Checkout
-                            </Button>
-                        </div>
+                                Order summary
+                            </h2>
+
+                            <dl className="mt-6 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <dt className="text-sm text-muted-foreground">
+                                        Subtotal
+                                    </dt>
+                                    <dd className="text-sm font-medium">
+                                        {formatPrice(subtotal, region)}
+                                    </dd>
+                                </div>
+                                <div className="flex items-center justify-between border-t border-border pt-4">
+                                    <dt className="text-sm text-muted-foreground">
+                                        Shipping estimate
+                                    </dt>
+                                    <dd className="text-sm font-medium">
+                                        {formatPrice(shippingEstimate, region)}
+                                    </dd>
+                                </div>
+                                <div className="flex items-center justify-between border-t border-border pt-4">
+                                    <dt className="text-sm text-muted-foreground">
+                                        Tax estimate
+                                    </dt>
+                                    <dd className="text-sm font-medium">
+                                        {formatPrice(taxEstimate, region)}
+                                    </dd>
+                                </div>
+                                <div className="flex items-center justify-between border-t border-border pt-4">
+                                    <dt className="text-base font-medium">
+                                        Order total
+                                    </dt>
+                                    <dd className="text-base font-medium">
+                                        {formatPrice(orderTotal, region)}
+                                    </dd>
+                                </div>
+                            </dl>
+
+                            <div className="mt-6">
+                                <Button
+                                    type="button"
+                                    className="w-full bg-indigo-600 px-4 py-3 text-base font-medium text-white hover:bg-indigo-700"
+                                    disabled={processing}
+                                    onClick={() => post('/checkout')}
+                                >
+                                    Checkout
+                                </Button>
+                            </div>
+                        </section>
                     </div>
                 )}
             </div>

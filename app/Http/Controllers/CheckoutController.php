@@ -151,6 +151,7 @@ class CheckoutController extends Controller
         $secret = config('services.stripe.secret');
         if (! $secret) {
             $user->cartItems()->delete();
+            // When Stripe isn't configured, treat checkout as completed.
             $order->update(['status' => 'completed']);
 
             return redirect()->route('orders.index')->with('status', 'Order placed. Add STRIPE_KEY and STRIPE_SECRET to .env for payment.');

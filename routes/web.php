@@ -33,12 +33,14 @@ Route::get('/storage/listings/{path}', function (string $path) {
 // Locale switcher (store in session, redirect back)
 Route::post('/locale', function (\Illuminate\Http\Request $request) {
     $locale = $request->input('locale');
-    if (in_array($locale, ['en', 'zh', 'my'], true)) {
+    if (in_array($locale, ['en', 'zh', 'my', 'ja'], true)) {
         Session::put('locale', $locale);
     }
 
     return redirect()->back();
 })->name('locale');
+
+Route::passkeys();
 
 // Dashboard is the default page (public; login/register in navbar for guests)
 Route::get('/', function (\Illuminate\Http\Request $request) {

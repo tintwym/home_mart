@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\PasskeyController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\PaymentController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -49,4 +50,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Myanmar local payment methods (saved locally; not Stripe).
     Route::post('settings/payment/local/default', [PaymentController::class, 'setDefaultLocal'])->name('payment.local.set-default');
     Route::delete('settings/payment/local/{localPaymentMethodId}', [PaymentController::class, 'destroyLocal'])->name('payment.local.destroy');
+
+    Route::get('settings/passkeys/register-options', [PasskeyController::class, 'registerOptions'])
+        ->name('settings.passkeys.register-options');
+    Route::post('settings/passkeys', [PasskeyController::class, 'store'])->name('settings.passkeys.store');
+    Route::delete('settings/passkeys/{passkey}', [PasskeyController::class, 'destroy'])->name('settings.passkeys.destroy');
 });

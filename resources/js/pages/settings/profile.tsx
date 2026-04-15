@@ -1,5 +1,6 @@
 import { Transition } from '@headlessui/react';
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
@@ -8,21 +9,76 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/hooks/use-translations';
+import {
+    browserSupportsWebAuthn,
+    startRegistration,
+} from '@/lib/passkeys-client';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { BreadcrumbItem, SharedData } from '@/types';
 
+type PasskeyRow = {
+    id: number;
+    name: string;
+    last_used_at: string | null;
+};
+
 export default function Profile({
     mustVerifyEmail,
     status,
+    passkeys = [],
 }: {
     mustVerifyEmail: boolean;
     status?: string;
+    passkeys?: PasskeyRow[];
 }) {
     const { auth } = usePage<SharedData>().props;
     const { t } = useTranslations();
+    const [passkeyBusy, setPasskeyBusy] = useState(false);
+    const [passkeyName, setPasskeyName] = useState('');
+
+    const canManagePasskeys = Boolean(auth.user?.email_verified_at);
+
+    const addPasskey = async () => {
+        if (!canManagePasskeys) {
+            return;
+        }
+        setPasskeyBusy(true);
+        try {
+            const res = await fetch('/settings/passkeys/register-options', {
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) {
+                throw new Error('options');
+            }
+            const optionsJSON = await res.json();
+            const registration = await startRegistration({ optionsJSON });
+            router.post(
+                '/settings/passkeys',
+                {
+                    options: JSON.stringify(optionsJSON),
+                    passkey: JSON.stringify(registration),
+                    name: passkeyName.trim() || 'Passkey',
+                },
+                {
+                    preserveScroll: true,
+                    onFinish: () => setPasskeyBusy(false),
+                },
+            );
+        } catch {
+            setPasskeyBusy(false);
+        }
+    };
+
+    const removePasskey = (id: number) => {
+        if (!confirm('Remove this passkey?')) {
+            return;
+        }
+        router.delete(`/settings/passkeys/${id}`, { preserveScroll: true });
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -44,6 +100,81 @@ export default function Profile({
                         title={t('settings.profile_details')}
                         description={t('settings.profile_description')}
                     />
+
+                    {browserSupportsWebAuthn() ? (
+                        <div className="rounded-lg border border-border bg-card p-4">
+                            <h3 className="text-sm font-semibold">Passkeys</h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Sign in with Face ID, Touch ID, or your device
+                                passkey. Add a passkey on each device you use.
+                            </p>
+                            {!canManagePasskeys ? (
+                                <p className="mt-3 text-sm text-amber-600 dark:text-amber-500">
+                                    Verify your email to add passkeys.
+                                </p>
+                            ) : (
+                                <>
+                                    <div className="mt-3 grid gap-2">
+                                        <Label htmlFor="passkey-name">
+                                            Label (optional)
+                                        </Label>
+                                        <Input
+                                            id="passkey-name"
+                                            value={passkeyName}
+                                            onChange={(e) =>
+                                                setPasskeyName(e.target.value)
+                                            }
+                                            placeholder="e.g. MacBook, iPhone"
+                                            disabled={passkeyBusy}
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="mt-3"
+                                        disabled={passkeyBusy}
+                                        onClick={() => void addPasskey()}
+                                    >
+                                        {passkeyBusy
+                                            ? 'Working…'
+                                            : 'Add passkey'}
+                                    </Button>
+                                </>
+                            )}
+                            {passkeys.length > 0 ? (
+                                <ul className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
+                                    {passkeys.map((pk) => (
+                                        <li
+                                            key={pk.id}
+                                            className="flex items-center justify-between gap-2"
+                                        >
+                                            <span>
+                                                <span className="font-medium">
+                                                    {pk.name}
+                                                </span>
+                                                <span className="ml-2 text-muted-foreground">
+                                                    {pk.last_used_at
+                                                        ? new Date(
+                                                              pk.last_used_at,
+                                                          ).toLocaleString()
+                                                        : 'Never used'}
+                                                </span>
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="text-destructive hover:underline"
+                                                onClick={() =>
+                                                    removePasskey(pk.id)
+                                                }
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
+                        </div>
+                    ) : null}
 
                     <Form
                         action={ProfileController.update.url()}

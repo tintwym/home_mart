@@ -13,6 +13,7 @@ const LOCALES: { code: string; label: string }[] = [
     { code: 'en', label: 'English' },
     { code: 'zh', label: '中文' },
     { code: 'my', label: 'မြန်မာ' },
+    { code: 'ja', label: '日本語' },
 ];
 
 export function LanguageSwitcher() {

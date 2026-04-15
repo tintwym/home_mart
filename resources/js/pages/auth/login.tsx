@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import {
+    browserSupportsWebAuthn,
+    startAuthentication,
+} from '@/lib/passkeys-client';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
@@ -13,15 +18,45 @@ import { request } from '@/routes/password';
 
 type Props = {
     status?: string;
+    passkeyError?: string | null;
     canResetPassword: boolean;
     canRegister: boolean;
 };
 
 export default function Login({
     status,
+    passkeyError,
     canResetPassword,
     canRegister,
 }: Props) {
+    const [passkeyLoading, setPasskeyLoading] = useState(false);
+
+    const loginWithPasskey = async () => {
+        setPasskeyLoading(true);
+        try {
+            const res = await fetch('/passkeys/authentication-options', {
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) {
+                throw new Error('Failed to load passkey options');
+            }
+            const optionsJSON = await res.json();
+            const credential = await startAuthentication({ optionsJSON });
+            router.post(
+                '/passkeys/authenticate',
+                {
+                    start_authentication_response: JSON.stringify(credential),
+                },
+                {
+                    onFinish: () => setPasskeyLoading(false),
+                },
+            );
+        } catch {
+            setPasskeyLoading(false);
+        }
+    };
+
     return (
         <AuthLayout
             title="Log in to your account"
@@ -97,6 +132,19 @@ export default function Login({
                                 {processing && <Spinner />}
                                 Log in
                             </Button>
+
+                            {browserSupportsWebAuthn() ? (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full"
+                                    disabled={processing || passkeyLoading}
+                                    onClick={() => void loginWithPasskey()}
+                                >
+                                    {passkeyLoading && <Spinner />}
+                                    Sign in with passkey
+                                </Button>
+                            ) : null}
                         </div>
 
                         {canRegister && (
@@ -116,6 +164,12 @@ export default function Login({
                     {status}
                 </div>
             )}
+
+            {passkeyError ? (
+                <div className="mb-4 text-center text-sm font-medium text-destructive">
+                    {passkeyError}
+                </div>
+            ) : null}
         </AuthLayout>
     );
 }
